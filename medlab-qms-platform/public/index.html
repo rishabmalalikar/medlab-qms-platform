@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QMS Form</title>
+  <link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body {
+      /* background-image: url('./KLE.jpg'); */
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      z-index: -5;
+    } 
+    body { background-size: cover; font-family:Arial, sans-serif; text-align: center; padding: 50px; }
+    h2 { color: rgb(177, 250, 238);}
+    a{
+      display: inline-block;
+      margin: 15px;
+      padding: 15px 25px;
+      z-index: 1;
+      background: rgb(0, 66, 128);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    a:hover { background: rgb(0, 104, 201); }
+    img {
+    display: inline-block;
+    margin: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    border: 3px solid #ccc;
+  }
+
+  .grid-item:hover {
+    transform: scale(1.27); /* Slight zoom effect on hover */
+    transition: transform 0.2s all ease;
+  }
+  .grid-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;  
+  gap: 10px;
+}
+
+.grid-item {
+  border: 1px solid rgba(0, 0, 0, 0);
+  padding: 1px;
+}
+  </style> 
+</head>
+<body>
+  <img src="./img/icon_1.png" alt="Logout" onclick="logout()" style="position: absolute; top: 1px; right:10px; width: 30px;  height: 30px; cursor: pointer; border-color: rgba(255, 255, 255, 0);" title="Logout">
+
+  <div  style="background-color: rgb(2, 2, 146);">
+    <h1 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h1>
+    <!-- <h2 style="margin-bottom: 0%; margin-top: 0%;" >HI - TECH LABORATORY HAEMATOLOGY / CLINICAL PATHOLOGY DEPARTMENT</h2> -->
+  </div>
+  <div  style="background-color: rgb(2, 2, 146); margin-top: 0.5%;">
+    <h2 style="margin-bottom: 0%; margin-top: 0%; padding-bottom: 1%; padding-top: 1%;" >HI - TECH LABORATORY HAEMATOLOGY / CLINICAL PATHOLOGY DEPARTMENT</h2>
+
+    <!-- <h2 style="padding-bottom: 25px;margin-bottom: 0%; text-align: center;">Select Form</h2> -->
+  </div>
+  <div class="grid-container">
+    <div class="grid-item" style="display: block; padding: 20px; margin-bottom: 5px;"><img src="./img/DailyActivityChecklist.png" onclick="window.location.href='dailyChecklist.html'" alt="Daily Activity Checklist" style="width:150px; height:150px; cursor:pointer; margin:10px; border-radius: 10px;" title="Daily Activity Checklist"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">Daily Activity Checklist</p></div>
+  
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/MicroscopeMaintenance.png" onclick="window.location.href='microscopeMaintenance.html'" alt="microscopeMaintenance" style="width:150px; height:150px; cursor:pointer; margin:10px; border-radius:10px;" title="Daily Activity Checklist"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder;position: relative;">Microscope Maintenance</p></div>
+  
+  <!-- <a href="microscopeMaintenance.html">Microscope Maintenance</a> -->
+  
+  
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/Wright's_Stain_Log.png" onclick="window.location.href='wrights.html'" alt="Wright's Stain Log" style="width:80px; height:80px; cursor:pointer; margin:10px; border-radius:10px;  padding: 35px; background-color: white;" title="Wright's Stain Log"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">Wright's Stain</p></div>
+  <!-- <a href="wrights.html">Wright's Stain Log</a> -->
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/pH_Meter.png" onclick="window.location.href='phmeter.html'" alt="pH Meter Log" style="width:80px; height:80px; cursor:pointer; margin:10px; border-radius:10px;  padding: 35px; background-color: white;" title="pH Meter Log"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">pH Meter</p></div>
+  <!-- <a href="phmeter.html">pH Meter Log</a> -->
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/Centrifuge_Maintenance.jpg" onclick="window.location.href='centrifuge.html'" alt="Centrifuge Maintenance" style="width:80px; height:80px; cursor:pointer; margin:10px; border-radius:10px;  padding: 35px; background-color: white;" title="Centrifuge Maintenance"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">Centrifuge Maintenance</p></div>
+  <!-- <a href="centrifuge.html">Centrifuge Maintenance</a> -->
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/water-bath.jpg" onclick="window.location.href='watherbath.html'" alt="Waterbath Maintenance" style="width:120px; height:120px; cursor:pointer; margin:10px; border-radius:10px;  padding: 15px; background-color: white;" title="Waterbath Maintenance"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">Waterbath Maintenance</p></div>
+  <!-- <a href="watherbath.html">Waterbath Maintenance</a> -->
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/BC6000Series.png" onclick="window.location.href='bc60000.html'" alt="BC6000Series Maintenance" style="width:120px; height:120px; cursor:pointer; margin:10px; border-radius:10px;  padding: 15px; background-color: white;" title="BC6000Series Maintenance"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">BC6000Series Maintenance</p></div>
+  <!-- <a href="bc60000.html">BC6000Series Maintenance</a> -->
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/MalarialParasite.png" onclick="window.location.href='inter_observer_record_malarial.html'" alt="Inter-Observer Record for Malarial Parasite" style="width:120px; height:120px; cursor:pointer; margin:10px; border-radius:10px;  padding: 15px; background-color: white;" title="Inter-Observer Record for Malarial Parasite"><pre style="font-family: Arial, sans-serif; color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">
+Inter-Observer Record For
+Malarial Parasite</pre></div>
+  <!-- <a href="inter_observer_record_malarial.html">Inter-Observer Record for Malarial Parasite</a> -->
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/ReticulocyteCount.png" onclick="window.location.href='inter_observer_record_Reticulocyte_Count.html'" alt="Inter-Observer Record for Reticulocyte Count" style="width:120px; height:120px; cursor:pointer; margin:10px; border-radius:10px;  padding: 15px; background-color: white;" title="Inter-Observer Record for Reticulocyte Count"><pre style="font-family: Arial, sans-serif; color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">
+    Inter-Observer Record For 
+ Reticulocyte Count</pre></div>
+  <!-- <a href="inter_observer_record_Reticulocyte_Count.html">Inter-Observer Record for Reticulocyte Count</a> -->
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/Body_Fluids.png" onclick="window.location.href='inter_observer_record_Body_Fluids.html'" alt="Inter-Observer Record for Body Fluids" style="width:120px; height:120px; cursor:pointer; margin:10px; border-radius:10px;  padding: 15px; background-color: white;" title="Inter-Observer Record for Body Fluids"><pre style="font-family: Arial, sans-serif; color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">
+  Inter-Observer Record For 
+    Body Fluids</pre></div>
+  <!-- <a href="inter_observer_record_Body_Fluids.html">Inter-Observer Record for Body Fluids</a> -->
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/PeripheralSmear.png" onclick="window.location.href='inter_observer_record_Peripheral_Smear.html'" alt="Inter-Observer Record for Peripheral Smear" style="width:120px; height:120px; cursor:pointer; margin:10px; border-radius:10px;  padding: 15px; background-color: white;" title="Inter-Observer Record for Peripheral Smear"><pre style="font-family: Arial, sans-serif; color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">
+  Inter-Observer Record For 
+  Peripheral Smear</pre></div>
+  <!-- <a href="inter_observer_record_Peripheral_Smear.html">Inter-Observer Record for Peripheral Smear</a> -->
+
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/XN1000.png" onclick="window.location.href='operatorMaintenanceScheduleForXN1000.html'" alt="Operator Maintenance Schedule For XN 1000" style="width:120px; height:120px; cursor:pointer; margin:10px; border-radius:10px;  padding: 15px; background-color: white;" title="Operator Maintenance Schedule For XN 1000"><pre style="font-family: Arial, sans-serif; color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">
+Operator Maintenance
+ Schedule ForXN 1000</pre></div>
+  <!-- <a href="operatorMaintenanceScheduleForXN1000.html">Operator Maintenance Schedule For XN 1000</a> -->
+
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/XN 3100 Left.png" onclick="window.location.href='operatorMaintenanceScheduleForXN3100Left.html'" alt="Operator Maintenance Schedule For XN 3100 Left" style="width:120px; height:120px; cursor:pointer; margin:10px; border-radius:10px;  padding: 15px; background-color: white;" title="Operator Maintenance Schedule For XN 3100 Left"><pre style="font-family: Arial, sans-serif; color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">
+Operator Maintenance
+ Schedule ForXN 3100 Left</pre></div>
+  <!-- <a href="operatorMaintenanceScheduleForXN3100Left.html">Operator Maintenance Schedule For XN 3100 Left</a> -->
+
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><img src="./img/XN 3100 Right.png" onclick="window.location.href='operatorMaintenanceScheduleForXN3100Right.html'" alt="Operator Maintenance Schedule For XN 3100 Right" style="width:120px; height:120px; cursor:pointer; margin:10px; border-radius:10px;  padding: 15px; background-color: white;" title="Operator Maintenance Schedule For XN 3100 Right"><pre style="font-family: Arial, sans-serif; color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">
+Operator Maintenance 
+Schedule For XN 3100 Right</pre></div>
+  <!-- <a href="operatorMaintenanceScheduleForXN3100Right.html">Operator Maintenance Schedule For XN 3100 Right</a> -->
+    
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><a href="OperatorMaintenanceScheduleforSYSMEXSP50.html">Operator Maintenance Schedule For Sysmex SP-50</a><pre style="font-family: Arial, sans-serif; color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">
+Operator Maintenance 
+Schedule For Sysmex SP-50</pre></div>
+
+
+
+    <div class="grid-item" style="display: block; position: relative; padding-top: 20px; padding-right: 10px;  margin-bottom: 5px;"><a href="Maintenance_ACL_TOP_550.html">Maintenance Schedule For ACL TOP 550</a><pre style="font-family: Arial, sans-serif; color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;">
+Maintenance Schedule For 
+ACL TOP 550</pre></div>
+  
+  </div>
+</body>
+
+
+
+
+
+
+<script>
+
+async function logout() {
+  try {
+    const res = await fetch("http://10.0.9.188:5000/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      //  Cookie cleared successfully
+      window.location.href = "/login.html";
+    } else {
+      const msg = await res.text();
+      alert("Logout failed: " + msg);
+    }
+  } catch (err) {
+    console.error("Logout error:", err);
+    alert("An error occurred while logging out.");
+  }
+}
+</script>
+</html>
