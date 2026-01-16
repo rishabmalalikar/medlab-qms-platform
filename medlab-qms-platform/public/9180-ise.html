@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>9180 ISE MAINTENANCE</title>
+<link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+    input[type="text"] { width: 90%; }
+    button { margin: 10px 5px; padding: 8px 15px; background: green; color: white; border: none; cursor: pointer; }
+    button:hover { background: darkgreen; }
+    .check-btn { background: blue; }
+    .check-btn:hover { background: darkblue; }
+    
+  </style>
+</head>
+<body>
+  <div  style="background-color: rgb(2, 2, 146); text-align: center;">
+    <h2 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
+  </div>
+
+  <div  style="background-color: rgb(2, 2, 146); margin-top: 0.5%; text-align: center;">
+    <h3 style="margin-bottom: 0%; margin-top: 0%; padding-bottom: 1%; padding-top: 1%; color: rgb(177, 250, 238);" >HI - TECH LABORATORY BIOCHEMISTRY DEPARTMENT</h3>
+  </div>
+
+<h2 style="text-align:center;">
+  9180 ISE MAINTENANCE CHECKLIST
+</h2>
+
+
+
+  <label>Select Date: </label>
+  <input type="date" id="date" required />
+  <button class="check-btn" onclick="checkEntry()">Check Entry</button>
+  <button onclick="window.location.href='index.html'" style="background: #888; color: white; margin-bottom: 10px; font-size:medium;">Back</button>
+  <button onclick="submitForm()" style="position: relative;  margin-left:46%; padding-left: 25px; padding-right: 25px; font-size:medium;  ">Submit</button>
+  <button id="sendAuthBtn" onclick="sendForAuthorization()"style=" padding-left: 25px; padding-right: 25px; font-size:medium;">Send for Authorization</button>
+  <table id="activityTable">
+
+<!-- DAILY -->
+<h3>Daily Maintenance</h3>
+<table>
+  <tr><th>Activity</th><th>Entry</th></tr>
+  <tr><td>Check Fluid Level</td><td><input id="check_fluid_level"></td></tr>
+  <tr><td>Check Printer Paper</td><td><input id="check_printer_paper"></td></tr>
+  <tr><td>Clean Needle / Fillport</td><td><input id="clean_needle_fillport"></td></tr>
+  <tr><td>Perform Cleaning / Conditioning</td><td><input id="perform_cleaning_conditioning"></td></tr>
+  <tr><td>Surface Cleaning</td><td><input id="surface_cleaning"></td></tr>
+  <tr><td>Staff Initial</td><td><input id="staff_initial"></td></tr>
+</table>
+
+<!-- WEEKLY -->
+<h3>Weekly Maintenance</h3>
+<table>
+  <tr><th>Activity</th><th>Entry</th></tr>
+  <tr><td>Perform All Above Daily Maintenance</td><td><input id="perform_all_daily_maintenance"></td></tr>
+  <tr><td>Clean Sample Drip Tray</td><td><input id="clean_sample_drip_tray"></td></tr>
+  <tr><td>Clean Chassis</td><td><input id="clean_chassis"></td></tr>
+</table>
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div id="customModal" style="
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0, 0, 0, 0.900);
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        ">
+          <div style="background:rgb(18, 28, 70); padding:20px; border-radius:8px; width:350px; text-align:center; font-size:14px;">
+            <p id="modalMessage" style="color: rgb(214, 214, 214); font-size: larger;font-weight:400;">Message here...</p>
+            <div style="margin-top:15px;">
+              <button id="okBtn" style="background:green; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">OK</button>
+              <button id="cancelBtn" style="background:gray; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      function showModal(message, isConfirm = false) {
+        return new Promise(resolve => {
+          const modal = document.getElementById("customModal");
+          const msg = document.getElementById("modalMessage");
+          const okBtn = document.getElementById("okBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+
+          msg.innerText = message;
+          modal.style.display = "flex";
+          cancelBtn.style.display = isConfirm ? "inline-block" : "none";
+
+          okBtn.onclick = () => { modal.style.display = "none"; resolve(true); };
+          cancelBtn.onclick = () => { modal.style.display = "none"; resolve(false); };
+        });
+      }
+      // Override default alert & confirm
+      window.alert = function(message) {
+        return showModal(message, false);
+      };
+      window.confirm = function(message) {
+        return showModal(message, true);
+      };
+    });
+
+
+const BASE_URL = "http://10.0.9.188:5000";
+
+/* ===== CHECK ENTRY ===== */
+async function checkEntry() {
+  const date = document.getElementById("date").value;
+  if (!date) return alert("Please select a date");
+
+  const res = await fetch(`${BASE_URL}/9180-ise/${date}`);
+
+  if (!res.ok) {
+    alert("No data is present");
+    return;
+  }
+
+  const data = await res.json();
+  alert("Entry already present");
+
+  Object.keys(data).forEach(k => {
+    const el = document.getElementById(k);
+    if (el) el.value = data[k] || "";
+  });
+}
+
+/* ===== SUBMIT ===== */
+async function submitForm() {
+  const date = document.getElementById("date").value;
+  if (!date) return alert("Please select a date");
+
+  const payload = {
+    date,
+    check_fluid_level: check_fluid_level.value,
+    check_printer_paper: check_printer_paper.value,
+    clean_needle_fillport: clean_needle_fillport.value,
+    perform_cleaning_conditioning: perform_cleaning_conditioning.value,
+    surface_cleaning: surface_cleaning.value,
+    staff_initial: staff_initial.value,
+    perform_all_daily_maintenance: perform_all_daily_maintenance.value,
+    clean_sample_drip_tray: clean_sample_drip_tray.value,
+    clean_chassis: clean_chassis.value
+  };
+
+  const res = await fetch(`${BASE_URL}/9180-ise/submit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  alert(await res.text());
+}
+
+/* ===== SEND FOR AUTH ===== */
+async function sendForAuthorization() {
+  const date = document.getElementById("date").value;
+  if (!date) return alert("Please select a date");
+
+  const res = await fetch(`${BASE_URL}/send-for-authorization`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      formName: "9180 ISE MAINTENANCE",
+      date
+    })
+  });
+
+  alert(await res.text());
+  if (res.ok) lockForm();
+}
+
+function lockForm() {
+  document.querySelectorAll("input, button").forEach(el => el.disabled = true);
+}
+</script>
+
+
+</body>
+</html>

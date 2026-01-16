@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Form Data</title>
+  <link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+    input, textarea { width: 95%; padding: 5px; border: none; background: #f9f9f9; }
+    input:disabled, textarea:disabled { color: black; background: #f5f5f5; }
+    button { margin: 10px 5px; padding: 8px 15px; border: none; cursor: pointer; color: white; }
+    .fetch-btn { background: blue; }
+    .fetch-btn:hover { background: darkblue; }
+    .auth-btn { background: green; }
+    .reject-btn { background: crimson; }
+  </style>
+</head>
+<body>
+  <div  style="background-color: rgb(2, 2, 146); text-align: center;">
+    <h2 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
+  </div>
+  <h2> View Form Data Before Authorization</h2>
+
+  <label style="font-size: larger; font-weight: bold;">Select Form:</label>
+  <select id="formSelect" style="width: 30%; font-size: larger; height: 32px; background-color: rgb(183, 183, 183);">
+    <option value="formName">-- Select Form --</option>   
+    <option>Daily Activity Checklist</option>
+    <option>MICROSCOPE MAINTENANCE</option>
+    <option>BC6000Series MAINTENANCE</option>
+    <option>WRIGHTS STAIN</option>
+    <option>CENTRIFUGE MAINTENANCE</option>
+    <option>WATERBATH MAINTENANCE</option>
+    <option>pH METER</option>
+    <option>Operator Maintenance Schedule For XN1000</option>
+    <option>Operator Maintenance Schedule For XN3100 Left</option>
+    <option>Operator Maintenance Schedule For XN3100 Right</option>
+    <option>Operator Maintenance Schedule For Sysmex SP-50</option>
+    <option>Maintenance_ACL_TOP_550</option>
+    <option>INTER-OBSERVER RECORD MALARIAL</option>
+    <option>INTER-OBSERVER RECORD Reticulocyte Count</option>
+    <option>INTER-OBSERVER RECORD Body Fluids</option>
+    <option>INTER-OBSERVER RECORD Peripheral Smear</option>
+    <option>ABG COBAS b 221 MAINTENANCE</option>
+    <option>9180 ISE MAINTENANCE</option>
+    <option>D-10 HEMOGLOBIN TESTING SYSTEM</option>
+    <option>D-10 HEMOGLOBIN-DM22K09803 TESTING SYSTEM</option>
+    <option>COBAS PRO INTEGRATED</option>
+    <option>COBAS PURE INTEGRATED</option>
+  </select>
+<br>
+  <label style="font-size: larger; font-weight: bold;">Select Date:</label>
+  <input type="date" id="date" style="width: 10%; font-size: x-large; background-color: rgb(183, 183, 183);">
+  <button class="fetch-btn" onclick="viewForm()" style="font-size: large; border-radius: 10px;">Fetch Data</button>
+  <button onclick="window.location.href='authorizer-dashboard.html'" style="background:gray; font-size: medium; border-radius: 10px; font-size: large;" >Back</button>
+
+
+<button style="border-radius: 10px; background-color: rgb(0, 151, 101); font-size: large;" onclick="window.print()">Print this page</button>
+
+
+
+
+  <table id="formTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>Sr. No</th>
+        <th>Field</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody id="formTableBody">
+    </tbody>
+  </table>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div id="customModal" style="
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0, 0, 0, 0.900);
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        ">
+          <div style="background:rgb(18, 28, 70); padding:20px; border-radius:8px; width:350px; text-align:center; font-size:14px;">
+            <p id="modalMessage" style="color: rgb(214, 214, 214); font-size: larger;font-weight:400;">Message here...</p>
+            <div style="margin-top:15px;">
+              <button id="okBtn" style="background:green; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">OK</button>
+              <button id="cancelBtn" style="background:gray; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      function showModal(message, isConfirm = false) {
+        return new Promise(resolve => {
+          const modal = document.getElementById("customModal");
+          const msg = document.getElementById("modalMessage");
+          const okBtn = document.getElementById("okBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+
+          msg.innerText = message;
+          modal.style.display = "flex";
+          cancelBtn.style.display = isConfirm ? "inline-block" : "none";
+
+          okBtn.onclick = () => { modal.style.display = "none"; resolve(true); };
+          cancelBtn.onclick = () => { modal.style.display = "none"; resolve(false); };
+        });
+      }
+      // Override default alert & confirm
+      window.alert = function(message) {
+        return showModal(message, false);
+      };
+      window.confirm = function(message) {
+        return showModal(message, true);
+      };
+    });
+
+
+
+
+
+
+
+
+    async function viewForm() {
+      const formName = document.getElementById("formSelect").value;
+      const date = document.getElementById("date").value;
+
+      if (!formName || !date) {
+        alert("Please select both form and date.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://10.0.9.188:5000/view-form-data/${encodeURIComponent(formName)}/${date}`, {
+          credentials: "include"
+        });
+
+        if (!res.ok) {
+          const msg = await res.text();
+          alert(msg);
+          return;
+        }
+
+        const data = await res.json();
+        const tbody = document.getElementById("formTableBody");
+        tbody.innerHTML = "";
+
+        data.forEach((row, index) => {
+          Object.entries(row).forEach(([key, value]) => {
+            if (["id", "year", "month", "auth_status", "auth_by", "auth_date"].includes(key)) return;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${key.replaceAll("_", " ").toUpperCase()}</td>
+              <td><input value="${escapeHtml(value)}" disabled></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        });
+
+        document.getElementById("formTable").style.display = "table";
+      } catch (err) {
+        console.error("Error viewing form data:", err);
+        alert("Failed to load form data.");
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+  </script>
+</body>
+</html>

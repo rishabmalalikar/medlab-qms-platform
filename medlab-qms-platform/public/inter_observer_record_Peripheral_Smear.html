@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QMS - Inter-Observer Record for Peripheral Smear</title>
+  <link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #f4f4f4; }
+    button { margin: 10px 5px; padding: 8px 15px; background: green; color: white; border: none; cursor: pointer; }
+    button:hover { background: darkgreen; }
+    .check-btn { background: blue; }
+    .check-btn:hover { background: darkblue; }
+  </style>
+</head>
+<body>
+  <div  style="background-color: rgb(2, 2, 146); text-align: center;">
+    <h2 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
+  </div>
+
+  <div  style="background-color: rgb(2, 2, 146); margin-top: 0.5%; text-align: center;">
+    <h3 style="margin-bottom: 0%; margin-top: 0%; padding-bottom: 1%; padding-top: 1%; color: rgb(177, 250, 238);" >HI - TECH LABORATORY HAEMATOLOGY / CLINICAL PATHOLOGY DEPARTMENT</h3>
+  </div>
+  <body>
+  <h2 style="text-align: center;">Inter-Observer Record for Peripheral Smear</h2>
+
+  <label>Select Date: </label>
+  <input type="date" id="date" required />
+  <button class="check-btn" onclick="checkEntry()">Check Entry</button>
+  <button onclick="window.location.href='index.html'" style="background: #888;">Back</button>
+  <button onclick="submitForm()" style="position: relative;  margin-left:46%; padding-left: 25px; padding-right: 25px; font-size:medium;  ">Submit</button>
+  <button id="sendAuthBtn" onclick="sendForAuthorization()"style=" padding-left: 25px; padding-right: 25px; font-size:medium;">Send for Authorization</button>
+
+  <table id="logTable">
+    <thead>
+      <tr>
+        <th>Sr. No</th>
+        <th>Instrument / Field</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div id="customModal" style="
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0, 0, 0, 0.900);
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        ">
+          <div style="background:rgb(18, 28, 70); padding:20px; border-radius:8px; width:350px; text-align:center; font-size:14px;">
+            <p id="modalMessage" style="color: rgb(214, 214, 214); font-size: larger;font-weight:400;">Message here...</p>
+            <div style="margin-top:15px;">
+              <button id="okBtn" style="background:green; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">OK</button>
+              <button id="cancelBtn" style="background:gray; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      function showModal(message, isConfirm = false) {
+        return new Promise(resolve => {
+          const modal = document.getElementById("customModal");
+          const msg = document.getElementById("modalMessage");
+          const okBtn = document.getElementById("okBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+
+          msg.innerText = message;
+          modal.style.display = "flex";
+          cancelBtn.style.display = isConfirm ? "inline-block" : "none";
+
+          okBtn.onclick = () => { modal.style.display = "none"; resolve(true); };
+          cancelBtn.onclick = () => { modal.style.display = "none"; resolve(false); };
+        });
+      }
+      // Override default alert & confirm
+      window.alert = function(message) {
+        return showModal(message, false);
+      };
+      window.confirm = function(message) {
+        return showModal(message, true);
+      };
+    });
+
+
+
+
+
+
+    async function checkEntry() {
+      const date = document.getElementById("date").value;
+      if (!date) return alert("Please select a date first.");
+
+      const res = await fetch(`http://10.0.9.188:5000/interobserver_Peripheral_Smear/${date}`);
+      const data = await res.json();
+
+      if (res.status === 403) {
+        alert(data.message);
+        return;
+      }
+
+      const tbody = document.querySelector("#logTable tbody");
+      tbody.innerHTML = "";
+
+      const fields = [
+        { id: "sample_no", label: "Sample No" },
+        { id: "result1", label: "Result 1" },
+        { id: "consultant1", label: "Consultant 1" },
+        { id: "result2", label: "Result 2" },
+        { id: "consultant2", label: "Consultant 2" },
+        { id: "consistent_status", label: "Consistent / Inconsistent" },
+        { id: "remarks", label: "Remarks" }
+      ];
+
+      fields.forEach((f, i) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${f.label}</td>
+            <td><input type="text" id="${f.id}" value="${data[f.id] || ''}"></td>
+          </tr>
+        `;
+      });
+    }
+
+    async function submitForm() {
+      const date = document.getElementById("date").value;
+      if (!date) return alert("Select a date first.");
+
+      const log = {
+        sample_no: document.getElementById("sample_no").value,
+        result1: document.getElementById("result1").value,
+        consultant1: document.getElementById("consultant1").value,
+        result2: document.getElementById("result2").value,
+        consultant2: document.getElementById("consultant2").value,
+        consistent_status: document.getElementById("consistent_status").value,
+        remarks: document.getElementById("remarks").value
+      };
+
+      const res = await fetch("http://10.0.9.188:5000/interobserver_Peripheral_Smear/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, log })
+      });
+
+      const msg = await res.text();
+      alert(msg);
+    }
+
+    async function sendForAuthorization() {
+      const date = document.getElementById("date").value;
+      if (!date) return alert("Please select a date first.");
+
+      const formName = "INTER-OBSERVER RECORD Peripheral Smear";
+
+      const res = await fetch("http://10.0.9.188:5000/send-for-authorization", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ formName, date }),
+        credentials: "include"
+      });
+
+      const msg = await res.text();
+      alert(msg);
+
+      if (res.ok) {
+        document.querySelectorAll("input, button").forEach(el => (el.disabled = true));
+      }
+    }
+  </script>
+</body>
+

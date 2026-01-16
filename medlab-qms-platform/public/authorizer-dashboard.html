@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>QMS - Authorization Dashboard</title>
+<link rel="icon" href="./img/QMS1.jpg" type="image/png">
+<style>
+body { font-family: Arial; padding: 30px; background: #eef2f3; }
+table { border-collapse: collapse; width: 100%; background: white; border-radius: 20px;}
+th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+th { background: #004d80; color: white; padding-bottom: 15px; padding-top: 15px;border-top-left-radius: 15px;}
+button { padding: 13px 12px; margin: 10px; cursor: pointer; border-radius: 10px;}
+button.approve:hover {background:darkgreen; scale: 1.15;}
+button.approve { background: rgb(0, 160, 0); color: white; border: none; }
+button.reject { background: rgb(173, 0, 0); color: white; border: none; }
+button.reject:hover { background: darkred; scale: 1.15; }      
+button.view { background: rgb(210, 210, 210); color: black; border: none; }
+button.view:hover { background: rgb(156, 154, 154); scale: 1.15; }
+button.logout { background: gray; color: white; border: none;}
+button.logout:hover { background: darkgray; }
+
+</style>
+</head>
+<body>
+  <button style="background-color: rgb(217, 119, 0); border: none;"><a style="text-decoration: none; color: white; font-size: large;" href="./view_form_data.html">View Form Data Before Authorization</a></button>
+
+  <button style="background-color: darkslateblue; border: none;"><a style="text-decoration: none; color: white; font-size: large;" href="./Report.html">Report</a></button>
+
+  
+<img src="./img/icon_1.png" alt="Logout" onclick="logout()" style="position: absolute; top: 2%; right:10px; width: 30px;  height: 30px; cursor: pointer; border-color: rgba(255, 255, 255, 0);" title="Logout">
+
+<h2 style="background-color: rgb(2, 2, 146); color: white; padding: 15px;margin-bottom: 5px; margin-top: 10px;border-radius: 15px;">Pending Forms for Authorization</h2>
+  <table id="formsTable">
+    <thead>
+      <tr>
+        <th><input type="checkbox" id="selectAll"></th>
+        <th>Form Name</th>
+        <th>Date</th>
+        <th>Created By</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <button class="approve" onclick="bulkAuthorize()">Authorize Selected</button>
+  <button class="reject" onclick="bulkReject()">Reject Selected</button>
+ 
+
+
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div id="customModal" style="
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0, 0, 0, 0.900);
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        ">
+          <div style="background:rgb(18, 28, 70); padding:20px; border-radius:8px; width:350px; text-align:center; font-size:14px;">
+            <p id="modalMessage" style="color: rgb(214, 214, 214); font-size: larger;font-weight:400;">Message here...</p>
+            <div style="margin-top:15px;">
+              <button id="okBtn" style="background:green; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">OK</button>
+              <button id="cancelBtn" style="background:gray; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      function showModal(message, isConfirm = false) {
+        return new Promise(resolve => {
+          const modal = document.getElementById("customModal");
+          const msg = document.getElementById("modalMessage");
+          const okBtn = document.getElementById("okBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+
+          msg.innerText = message;
+          modal.style.display = "flex";
+          cancelBtn.style.display = isConfirm ? "inline-block" : "none";
+
+          okBtn.onclick = () => { modal.style.display = "none"; resolve(true); };
+          cancelBtn.onclick = () => { modal.style.display = "none"; resolve(false); };
+        });
+      }
+      // Override default alert & confirm
+      window.alert = function(message) {
+        return showModal(message, false);
+      };
+      window.confirm = function(message) {
+        return showModal(message, true);
+      };
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+async function loadPendingForms() {
+  const res = await fetch("http://10.0.9.188:5000/pending-forms", { credentials: "include" });
+  const data = await res.json();
+  if (data.length === 0) {
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="6" style="text-align:center; padding:20px;">
+        No pending forms
+      </td>
+    </tr>
+  `;
+  return;
+}
+
+  const tbody = document.querySelector("#formsTable tbody");
+  tbody.innerHTML = "";
+
+  data.forEach(form => {
+    const row = document.createElement("tr");
+    let ActivityDate = new Date(form.ActivityDate);
+    ActivityDate = ActivityDate.toLocaleDateString("en-CA");
+
+    //  Safely encode form name for onclick
+    const safeFormName = encodeURIComponent(form.FormName);
+
+    row.innerHTML = `
+      <td><input type="checkbox" value="${form.FormAuthID}"></td>
+      <td>${form.FormName}</td>
+      <td>${ActivityDate}</td>
+      <td>${form.CreatedBy}</td>
+      <td>${form.AuthStatus}</td>
+      <td>
+        <button class="view" onclick="viewForm('${safeFormName}', '${ActivityDate}')">View</button>
+        <button class="approve" onclick="authorizeForm(${form.FormAuthID})">Authorize</button>
+        <button class="reject" onclick="rejectForm(${form.FormAuthID})">Reject</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+    async function authorizeForm(id) {
+      await fetch("http://10.0.9.188:5000/authorize-form", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ authId: id })
+      });
+      alert("Form authorized successfully.");
+      loadPendingForms();
+    }
+
+    async function rejectForm(id) {
+      await fetch("http://10.0.9.188:5000/reject-form", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ authId: id })
+      });
+      alert("Form rejected.");
+      loadPendingForms();
+    }
+
+    async function bulkAuthorize() {
+      const selected = [...document.querySelectorAll("tbody input[type='checkbox']:checked")]
+  .map(cb => cb.value);
+
+      if (selected.length === 0) return alert("Select at least one form.");
+
+      await fetch("http://10.0.9.188:5000/bulk-authorization", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ authIds: selected, action: "authorize" })
+      });
+      alert(" Bulk authorized.");
+      loadPendingForms();
+    }
+
+    async function bulkReject() {
+      const selected = [...document.querySelectorAll("tbody input[type='checkbox']:checked")]
+  .map(cb => cb.value);
+
+      if (selected.length === 0) return alert("Select at least one form.");
+
+      await fetch("http://10.0.9.188:5000/bulk-authorization", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ authIds: selected, action: "reject" })
+      });
+      alert(" Bulk rejected.");
+      loadPendingForms();
+    }
+
+    // Select/Deselect all
+    document.getElementById("selectAll").addEventListener("change", (e) => {
+      document.querySelectorAll("tbody input[type='checkbox']").forEach(cb => cb.checked = e.target.checked);
+    });
+
+    loadPendingForms();
+
+
+
+
+
+
+
+
+
+    async function viewForm(encodedFormName, date) {
+    try {
+    const formName = decodeURIComponent(encodedFormName); // decode back
+    console.log("🔍 Viewing form:", formName, date);
+    const res = await fetch(`http://10.0.9.188:5000/view-form-data/${formName}/${date}`,{ credentials: "include" });
+    if (!res.ok) {
+      const msg = await res.text();
+      alert(msg);
+      return;
+    }
+
+    const data = await res.json();
+    const tbody = document.getElementById("viewTableBody");
+    tbody.innerHTML = "";
+    document.getElementById("viewFormTitle").innerText = `${formName} (${date})`;
+    data.forEach((row, index) => {
+      Object.entries(row).forEach(([key, value]) => {
+        if (["id", "year", "month", "auth_status", "auth_by", "auth_date"].includes(key)) return;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${key.replaceAll("_", " ").toUpperCase()}</td>`
+            function escapeHtml(str) {
+            return String(str ?? "")
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;");
+            }
+            let displayValue = value;
+            const parsed = new Date(value);
+            if (typeof value === "boolean") {
+            displayValue = value ? "Yes" : "No";
+            } 
+            else if (typeof value === "string"){
+              if (value[4] === '-' && value[7] === '-') {
+                // Possible date string in YYYY-MM-DD format
+                displayValue = parsed.toISOString().split('T')[0];
+              } else
+              displayValue = value.trim() === "" ? "-" : value;
+            }
+            tr.innerHTML += `<td><input value="${escapeHtml(displayValue)}" disabled style="width:100%; border:none; background:#f5f5f5;"></td>`;
+        tbody.appendChild(tr);
+      });
+    });
+
+    document.getElementById("viewModal").style.display = "flex";
+  } catch (err) {
+    console.error(" Error viewing form data:", err);
+    alert(" Failed to load form data.");
+  }
+}
+
+
+
+
+
+
+
+
+
+
+function closeViewModal() {
+  document.getElementById("viewModal").style.display = "none";
+}
+
+
+
+
+
+
+
+
+
+
+async function logout() {
+  try {
+    const res = await fetch("http://10.0.9.188:5000/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      //  Cookie cleared successfully
+      window.location.href = "/login.html";
+    } else {
+      const msg = await res.text();
+      alert("Logout failed: " + msg);
+    }
+  } catch (err) {
+    console.error("Logout error:", err);
+    alert("An error occurred while logging out.");
+  }
+}
+
+</script>
+    <!--  Form Data View Modal -->
+<div id="viewModal" style="
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.8);
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+">
+  <div style="background:white; padding:20px; border-radius:10px; width:80%; max-height:80%; overflow:auto;">
+    <h3 id="viewFormTitle" style="margin-top:0;"></h3>
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#004d80; color:white;">
+          <th>Sr. No</th>
+          <th>Field</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody id="viewTableBody"></tbody>
+    </table>
+    <div style="text-align:right; margin-top:10px;">
+      <button onclick="closeViewModal()" style="background:gray; color:white;">Close</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

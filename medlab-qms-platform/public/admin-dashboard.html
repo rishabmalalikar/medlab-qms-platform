@@ -30,7 +30,7 @@ cursor: pointer;
 a:hover, button:hover { background-color: #007acc; }
 h3 { margin-bottom: 10px; }
 .grid-item:hover {
-    transform: scale(1.27); /* Slight zoom effect on hover */
+    transform: scale(1.05); /* Slight zoom effect on hover */
     transition: transform 0.2s all ease;
   }
   .grid-container {
@@ -48,27 +48,29 @@ h3 { margin-bottom: 10px; }
 </style>
 </head>
 <body>
+  
   <img src="./img/icon_1.png" alt="Logout" onclick="logout()" style="position: absolute; top: 20px; right:10px; width: 30px;  height: 30px; cursor: pointer; border-color: rgba(255, 255, 255, 0);" title="Logout">
+  
 
-  <div  style="background-color: rgb(2, 2, 146);margin-top: 1px;">
-    <h2 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
+
+  <div  style="background-color: rgb(2, 2, 146);">
+    <h2 style="margin: 0%; padding: 15px; padding-left: 50px; padding-top: 15px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
     <!-- <h2 style="margin-bottom: 0%; margin-top: 0%;" >HI - TECH LABORATORY HAEMATOLOGY / CLINICAL PATHOLOGY DEPARTMENT</h2> -->
   </div>
   <div  style="background-color: rgb(2, 2, 146); margin-top: 0.5%;">
     <h2 style="margin-bottom: 0%; margin-top: 0%; padding-bottom: 1%; padding-top: 1%;" >HI - TECH LABORATORY HAEMATOLOGY / CLINICAL PATHOLOGY DEPARTMENT</h2>
 
-    <!-- <h2 style="padding-bottom: 25px;margin-bottom: 0%; text-align: center;">Select Form</h2> -->
   </div>
-  <h2>Admin Dashboard</h2>
+  <h2 style="margin-top: 5px; margin-bottom: 5px;">Admin Dashboard</h2>
 
   <div class="grid-container">
-    <div class="grid-item" style="display: block; padding: 20px; margin-bottom: 5px;"><img src="./img/create-employee.png"onclick="window.location.href='createEmployee.html'" alt="Daily Activity Checklist" style="background-color: white; width:200px; height:200px; cursor:pointer; margin:10px; border-radius: 10px;" title="Daily Activity Checklist"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;color: white;">Employee Management</p></div>
+    <div class="grid-item" style="display: block; padding: 15px; margin-bottom: 5px;"><img src="./img/create-employee.png"onclick="window.location.href='createEmployee.html'" alt="Employee Management" style="background-color: white; width:200px; height:200px; cursor:pointer; border-radius: 10px;" title="Employee Management"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;color: white;">Employee Management</p></div>
 
 
-    <div class="grid-item" style="display: block; padding: 20px; margin-bottom: 5px;"><img src="./img/Authorization.png"onclick="window.location.href='authorizer-dashboard.html'" alt="Daily Activity Checklist" style="background-color: white; width:200px; height:200px; cursor:pointer; margin:10px; border-radius: 10px;" title="Daily Activity Checklist"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;color: white;">Authorization Management</p></div>
+    <div class="grid-item" style="display: block; padding: 15px; margin-bottom: 5px;"><img src="./img/Authorization.png"onclick="window.location.href='authorizer-dashboard.html'" alt="Authorization Management" style="background-color: white; width:200px; height:200px; cursor:pointer; border-radius: 10px;" title="Authorization Management"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;color: white;">Authorization Management</p></div>
 
 
-    <div class="grid-item" style="display: block; padding: 20px; margin-bottom: 5px;"><img src="./img/form.png"onclick="window.location.href='index.html'" alt="Daily Activity Checklist" style="background-color: white; width:200px; height:200px; cursor:pointer; margin:10px; border-radius: 10px;" title="Daily Activity Checklist"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;color: white;">Form Access</p></div>
+    <div class="grid-item" style="display: block; padding: 10px; margin-bottom: 5px;"><img src="./img/form.png"onclick="window.location.href='index.html'" alt="Form Access" style="background-color: white; width:200px; height:200px; cursor:pointer; border-radius: 10px;" title="Form Access"><p style="color: rgb(0, 0, 0); font-size: 16px; font-weight: bolder; position: relative;color: white;">Form Access</p></div>
   
   </div>
 

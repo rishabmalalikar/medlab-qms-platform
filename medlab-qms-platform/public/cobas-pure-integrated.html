@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cobas Pure Integrated</title>
+<link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+    input[type="text"] { width: 90%; }
+    button { margin: 10px 5px; padding: 8px 15px; background: green; color: white; border: none; cursor: pointer; }
+    button:hover { background: darkgreen; }
+    .check-btn { background: blue; }
+    .check-btn:hover { background: darkblue; }
+    table{ margin:15px;}
+    th{
+        width: 50%;
+    }
+    
+    h2{
+        text-align: center;
+        margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div  style="background-color: rgb(2, 2, 146); text-align: center;">
+    <h2 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
+  </div>
+
+  <div  style="background-color: rgb(2, 2, 146); margin-top: 0.5%; text-align: center;">
+    <h3 style="margin-bottom: 0%; margin-top: 0%; padding-bottom: 1%; padding-top: 1%; color: rgb(177, 250, 238);" >HI - TECH LABORATORY BIOCHEMISTRY DEPARTMENT</h3>
+  </div>
+<h2>Cobas Pure Integrated – Maintenance Log</h2>
+<label>Select Date: </label>acb
+  <input type="date" id="date" required />
+  <button class="check-btn" onclick="checkEntry()">Check Entry</button>
+  <button onclick="window.location.href='index.html'" style="background: #888; color: white; margin-bottom: 10px; font-size:medium;">Back</button>
+  <button onclick="submitForm()" style="position: relative;  margin-left:46%; padding-left: 25px; padding-right: 25px; font-size:medium;  ">Submit</button>
+  <button id="sendAuthBtn" onclick="sendForAuthorization()"style=" padding-left: 25px; padding-right: 25px; font-size:medium;">Send for Authorization</button>
+
+
+<table>
+    <caption>Daily</caption>
+<tr>
+    <th>Wash Rack</th>
+    <td><input id="wash_rack"></td>
+</tr>
+<tr>
+    <th>ISE Calibration (Daily)</th>
+    <td><input id="ise_calibration_daily"></td>
+</tr>
+</table>
+
+<table>
+<caption>Weekly</caption>   
+<tr>
+    <th>Weekly Rack & Probe clean manually</th>
+    <td><input id="weekly_rack_probe_clean"></td>
+</tr>
+<tr>
+    <th>ISE Calibration (Weekly)</th>
+    <td><input id="ise_calibration_weekly"></td>
+</tr>
+</table>
+
+<table>
+    <caption>Monthly</caption>
+<tr>
+    <th>Reaction Cells</th>
+    <td><input id="reaction_cells"></td>
+</tr>
+<tr>
+    <th>Photometer Lamp</th>
+    <td><input id="photometer_lamp"></td>
+</tr>
+</table>
+
+<table>
+    <caption>As needed</caption>
+<tr>
+    <th>Sipper flow path wash</th>
+    <td><input id="sipper_flow_path_wash"></td>
+<!-- </tr>
+</table>
+<table>
+<tr> -->
+    <th>Signature / Filled By</th>
+    <td><input id="filled_by"></td>
+  </tr>
+</table>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div id="customModal" style="
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0, 0, 0, 0.900);
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        ">
+          <div style="background:rgb(18, 28, 70); padding:20px; border-radius:8px; width:350px; text-align:center; font-size:14px;">
+            <p id="modalMessage" style="color: rgb(214, 214, 214); font-size: larger;font-weight:400;">Message here...</p>
+            <div style="margin-top:15px;">
+              <button id="okBtn" style="background:green; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">OK</button>
+              <button id="cancelBtn" style="background:gray; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      function showModal(message, isConfirm = false) {
+        return new Promise(resolve => {
+          const modal = document.getElementById("customModal");
+          const msg = document.getElementById("modalMessage");
+          const okBtn = document.getElementById("okBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+
+          msg.innerText = message;
+          modal.style.display = "flex";
+          cancelBtn.style.display = isConfirm ? "inline-block" : "none";
+
+          okBtn.onclick = () => { modal.style.display = "none"; resolve(true); };
+          cancelBtn.onclick = () => { modal.style.display = "none"; resolve(false); };
+        });
+      }
+      // Override default alert & confirm
+      window.alert = function(message) {
+        return showModal(message, false);
+      };
+      window.confirm = function(message) {
+        return showModal(message, true);
+      };
+    });
+
+
+
+
+
+
+
+const BASE_URL = "http://10.0.9.188:5000";
+
+async function checkEntry() {
+  const date = document.getElementById("date").value;
+  if (!date) return alert("Please select date");
+  const res = await fetch(`${BASE_URL}/cobas-pure-intrgrated/${date}`);
+  if (!res.ok) {
+    alert("NO entry is present");
+    return;
+  }
+  alert("Entry is present");
+  const data = await res.json();
+
+  Object.keys(data).forEach(k => {
+    if (document.getElementById(k))
+      document.getElementById(k).value = data[k] || "";
+  });
+}
+
+async function submitForm() {
+  const date = document.getElementById("date").value;
+  if (!date) return alert("Select date");
+  const payload = {
+    date,
+    wash_rack: wash_rack.value,
+    ise_calibration_daily: ise_calibration_daily.value,
+    weekly_rack_probe_clean: weekly_rack_probe_clean.value,
+    ise_calibration_weekly: ise_calibration_weekly.value,
+    reaction_cells: reaction_cells.value,
+    photometer_lamp: photometer_lamp.value,
+    sipper_flow_path_wash: sipper_flow_path_wash.value,
+    filled_by: filled_by.value
+  };
+
+  if (!filled_by.value.trim())
+  return alert("Please enter signature / filled by");
+
+  const res = await fetch(`${BASE_URL}/cobas-pure-integrated/submit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  alert(await res.text());
+}
+
+async function sendForAuthorization() {
+  const date = document.getElementById("date").value;
+  if (!date) return alert("Select date");
+
+  const res = await fetch(`${BASE_URL}/send-for-authorization`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({
+      formName: "COBAS PURE INTEGRATED",
+      date
+    })
+  });
+
+  alert(await res.text());
+  if (res.ok)
+    document.querySelectorAll("input,button").forEach(e => e.disabled = true);
+}
+</script>
+
+</body>
+</html>

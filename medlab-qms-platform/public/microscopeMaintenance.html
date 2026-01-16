@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QMS - Microscope Maintenance</title>
+  <link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #f4f4f4; }
+    input[type="text"] { width: 90%; }
+    button { margin: 10px 5px; padding: 8px 15px; background: green; color: white; border: none; cursor: pointer; }
+    button:hover { background: darkgreen; }
+    .check-btn { background: blue; }
+    .check-btn:hover { background: darkblue; }
+  </style>
+</head>
+<body>
+  <div  style="background-color: rgb(2, 2, 146); text-align: center;">
+    <h2 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
+  </div>
+
+  <div  style="background-color: rgb(2, 2, 146); margin-top: 0.5%; text-align: center;">
+    <h3 style="margin-bottom: 0%; margin-top: 0%; padding-bottom: 1%; padding-top: 1%; color: rgb(177, 250, 238);" >HI - TECH LABORATORY HAEMATOLOGY / CLINICAL PATHOLOGY DEPARTMENT</h3>
+  </div>
+  <h2 style="text-align:center;">Daily Microscope Maintenance</h2>
+
+  <label>Select Date: </label>
+  <input type="date" id="date" required />
+  <button class="check-btn" onclick="loadLogs()">Check Entries</button>
+  <button onclick="window.location.href='index.html'" style="background:#888;">Back</button>
+  <button onclick="submitLogs()" style="position: relative;  margin-left:46%; padding-left: 25px; padding-right: 25px; font-size:medium;  ">Submit</button>
+  <button id="sendAuthBtn" onclick="sendForAuthorization()"style=" padding-left: 25px; padding-right: 25px; font-size:medium;">Send for Authorization</button>
+
+  <table id="maintenanceTable">
+    <thead>
+      <tr>
+        <th>Sl. No.</th>
+        <th>Microscope</th>
+        <th>Cleaning</th>
+        <th>Working Condition</th>
+        <th>Sign</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div id="customModal" style="
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0, 0, 0, 0.900);
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        ">
+          <div style="background:rgb(18, 28, 70); padding:20px; border-radius:8px; width:350px; text-align:center; font-size:14px;">
+            <p id="modalMessage" style="color: rgb(214, 214, 214); font-size: larger;font-weight:400;">Message here...</p>
+            <div style="margin-top:15px;">
+              <button id="okBtn" style="background:green; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">OK</button>
+              <button id="cancelBtn" style="background:gray; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      function showModal(message, isConfirm = false) {
+        return new Promise(resolve => {
+          const modal = document.getElementById("customModal");
+          const msg = document.getElementById("modalMessage");
+          const okBtn = document.getElementById("okBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+
+          msg.innerText = message;
+          modal.style.display = "flex";
+          cancelBtn.style.display = isConfirm ? "inline-block" : "none";
+
+          okBtn.onclick = () => { modal.style.display = "none"; resolve(true); };
+          cancelBtn.onclick = () => { modal.style.display = "none"; resolve(false); };
+        });
+      }
+      // Override default alert & confirm
+      window.alert = function(message) {
+        return showModal(message, false);
+      };
+      window.confirm = function(message) {
+        return showModal(message, true);
+      };
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+    async function loadLogs() {
+      const date = document.getElementById("date").value;
+      if (!date) return alert("Please select a date first.");
+
+      try {
+        const res = await fetch(`http://10.0.9.188:5000/microscope-logs/${date}`);
+        const data = await res.json();
+
+        if (res.status === 403 && data.locked) {
+          alert(data.message);
+          document.querySelectorAll("input, button").forEach(el => el.disabled = true);
+          return;
+        }
+
+        const tbody = document.querySelector("#maintenanceTable tbody");
+        tbody.innerHTML = "";
+        data.logs.forEach((m, idx) => {
+          const row = `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${m.Microscope}</td>
+              <td><input type="checkbox" id="cleaning_${m.MicroscopeID}" ${m.Cleaning ? "checked" : ""}></td>
+              <td><input type="text" id="working_${m.MicroscopeID}" value="${m.WorkingCondition || ""}"></td>
+              <td><input type="text" id="sign_${m.MicroscopeID}" value="${m.Sign || ""}"></td>
+            </tr>
+          `;
+          tbody.insertAdjacentHTML("beforeend", row);
+        });
+
+      } catch (err) {
+        console.error(" Error loading logs:", err);
+        alert("Error fetching data from server.");
+      }
+    }
+
+    async function submitLogs() {
+      const date = document.getElementById("date").value;
+      if (!date) return alert("Please select a date first.");
+
+      const rows = document.querySelectorAll("#maintenanceTable tbody tr");
+      const logs = Array.from(rows).map(row => {
+        const microscope_id = row.querySelector("input[type=checkbox]").id.split("_")[1];
+        return {
+          microscope_id,
+          cleaning: row.querySelector(`#cleaning_${microscope_id}`).checked ? 1 : 0,
+          working_condition: row.querySelector(`#working_${microscope_id}`).value,
+          sign: row.querySelector(`#sign_${microscope_id}`).value
+        };
+      });
+
+      const res = await fetch("http://10.0.9.188:5000/submitMicroscopeLogs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, logs }),
+        credentials: "include"
+      });
+
+      const msg = await res.text();
+      alert(msg);
+    }
+
+    async function sendForAuthorization() {
+      const date = document.getElementById("date").value;
+      if (!date) return alert("Please select a date first.");
+
+      const formName = "MICROSCOPE MAINTENANCE";
+
+      const res = await fetch("http://10.0.9.188:5000/send-for-authorization", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ formName, date }),
+        credentials: "include"
+      });
+
+      const msg = await res.text();
+      alert(msg);
+
+      if (res.ok) document.querySelectorAll("input, button").forEach(el => el.disabled = true);
+    }
+  </script>
+
+</body>
+</html>
