@@ -63,61 +63,75 @@ This platform digitizes the entire workflow and centralizes all records in a sec
 ## 📁 Project Structure
 
 ```
-medlab-qms-platform/
-│
-├── /database
+medlab-qms-platform
+├── database
 │   └── QMS ALL TABLES.sql
-│
 ├── public
-|    ├── Maintenance_ACL_TOP_550.html
-|    ├── OperatorMaintenanceScheduleforSYSMEXSP50.html
-|    ├── admin-dashboard.html
-|    ├── authorizer-dashboard.html
-|    ├── bc60000.html
-|    ├── centrifuge.html
-|    ├── createEmployee.html
-|    ├── dailyChecklist.html
-|    ├── img
-|    │      ├── Authorization.png
-|    │      ├── BC6000Series.png
-|    │      ├── Body_Fluids.png
-|    │      ├── Centrifuge_Maintenance.jpg
-|    │      ├── DailyActivityChecklist.png
-|    │      ├── KLE.jpg
-|    │      ├── KLES_Logo.jpg
-|    │      ├── KLES_Logo.png
-|    │      ├── MalarialParasite.png
-|    │      ├── MicroscopeMaintenance.png
-|    │      ├── PeripheralSmear.png
-|    │      ├── QMS1.jpg
-|    │      ├── ReticulocyteCount.png
-|    │      ├── Wright's_Stain_Log.png
-|    │      ├── XN 3100 Left.png
-|    │      ├── XN 3100 Right.png
-|    │      ├── XN1000.png
-|    │      ├── create-employee.png
-|    │      ├── form.png
-|    │      ├── icon_1.png
-|    │      ├── pH_Meter.png
-|    │      ├── user.png
-|    │── water-bath.jpg
-|    ├── index.html
-|    ├── inter_observer_record_Body_Fluids.html
-|    ├── inter_observer_record_Peripheral_Smear.html
-|    ├── inter_observer_record_Reticulocyte_Count.html
-|    ├── inter_observer_record_malarial.html
-|    ├── login.html
-|    ├── microscopeMaintenance.html
-|    ├── model.js
-|    ├── operatorMaintenanceScheduleForXN1000.html
-|    ├── operatorMaintenanceScheduleForXN3100Left.html
-|    ├── operatorMaintenanceScheduleForXN3100Right.html
-|    ├── phmeter.html
-|    ├── view_form_data.html
-|    ├── watherbath.html
-|    └── wrights.html
-├──sessions
-├──server.js
+│   ├── 9180-ise.html
+│   ├── Maintenance_ACL_TOP_550.html
+│   ├── OperatorMaintenanceScheduleforSYSMEXSP50.html
+│   ├── Report.html
+│   ├── abg-cobas-b221.html
+│   ├── admin-dashboard.html
+│   ├── authorizer-dashboard.html
+│   ├── bc60000.html
+│   ├── centrifuge.html
+│   ├── cobas-pro-integrated.html
+│   ├── cobas-pure-integrated.html
+│   ├── createEmployee.html
+│   ├── d10-hemoglobin-DM22K09803.html
+│   ├── d10-hemoglobin.html
+│   ├── dailyChecklist.html
+│   ├── img
+│   │   ├── 9180 ISE .png
+│   │   ├── ABG.png
+│   │   ├── Authorization.png
+│   │   ├── BC6000Series.png
+│   │   ├── Body_Fluids.png
+│   │   ├── Centrifuge_Maintenance.jpg
+│   │   ├── Cobas Pro.png
+│   │   ├── Cobas Pure.png
+│   │   ├── DailyActivityChecklist.png
+│   │   ├── KLE.jpg
+│   │   ├── KLES_Logo.jpg
+│   │   ├── KLES_Logo.png
+│   │   ├── Maintenance Schedule For ACL TOP 550.png
+│   │   ├── MalarialParasite.png
+│   │   ├── MicroscopeMaintenance.png
+│   │   ├── Operator Maintenance Schedule For Sysmex SP-50.png
+│   │   ├── PeripheralSmear.png
+│   │   ├── QMS1.jpg
+│   │   ├── ReticulocyteCount.png
+│   │   ├── Wright's_Stain_Log.png
+│   │   ├── XN 3100 Left.png
+│   │   ├── XN 3100 Right.png
+│   │   ├── XN1000.png
+│   │   ├── create-employee.png
+│   │   ├── d10-hemoglobin DM22C30002.png
+│   │   ├── form.png
+│   │   ├── icon_1.png
+│   │   ├── pH_Meter.png
+│   │   ├── user.png
+│   │   └── water-bath.jpg
+│   ├── index.html
+│   ├── inter_observer_record_Body_Fluids.html
+│   ├── inter_observer_record_Peripheral_Smear.html
+│   ├── inter_observer_record_Reticulocyte_Count.html
+│   ├── inter_observer_record_malarial.html
+│   ├── login.html
+│   ├── microscopeMaintenance.html
+│   ├── model.js
+│   ├── operatorMaintenanceScheduleForXN1000.html
+│   ├── operatorMaintenanceScheduleForXN3100Left.html
+│   ├── operatorMaintenanceScheduleForXN3100Right.html
+│   ├── phmeter.html
+│   ├── test.html
+│   ├── view_form_data.html
+│   ├── watherbath.html
+│   └── wrights.html
+├── server.js
+└── sessions
+│   └── d-h93fuBe-ijXXNPfdNUi-L6fEKU3lSs.json
 └── README.md
 ```
 
