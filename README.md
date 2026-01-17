@@ -1,49 +1,62 @@
-# medlab-qms-platform
-A locally hosted Medical Laboratory Quality Management System (QMS) built with HTML, CSS, JS, and SQL database. Includes daily instrument maintenance forms, employee dashboard for data entry, authorization dashboard for form approval, and admin dashboard for user creation and access control.
-
-
 # MedLab QMS Platform
 
-A locally hosted **Quality Management System (QMS)** designed for **medical laboratories** to digitize instrument maintenance, documentation workflows, and compliance processes. This platform provides multi-role access, structured data management, and easy form handling for daily lab operations.
+A locally hosted, end-to-end Quality Management System (QMS) designed for medical laboratories to digitize instrument maintenance, documentation workflows, and compliance processes.
+
+This system replaces manual paper-based records with structured digital forms, improving accuracy, traceability, and operational efficiency.
 
 ---
 
-## 🚀 Features
+## 🧩 Problem Statement
+Medical laboratories traditionally maintain daily instrument and quality records on paper, which leads to:
+- Data inconsistency
+- Manual errors
+- Difficulty during audits
+- Poor record traceability
 
-### **1. Multi-Form Instrument Maintenance System**
+This platform digitizes the entire workflow and centralizes all records in a secure system.
 
-* Daily, weekly, and monthly maintenance forms
-* Structured records for compliance and audits
-* Secure storage of all submitted documentation
+---
 
-### **2. Role-Based Dashboards**
+## 🚀 Key Features
 
-#### **🛠 Admin Dashboard**
+### 1. Instrument Maintenance Forms
+- Daily, weekly, and monthly maintenance forms
+- Structured data storage for audits and compliance
+- Secure record management
 
-* Create, edit, and manage users
-* Assign access permissions
-* Access the Authorization and Employee dashboards
-* Monitor system-wide activity
+### 2. Role-Based Access Control
 
-#### **✔ Authorization Dashboard**
+#### 🛠 Admin Dashboard
+- Create and manage users
+- Assign roles and permissions
+- Monitor system-wide activity
 
-* View submitted forms from employees
-* Approve or reject maintenance entries
-* Ensure QC compliance and documentation standards
+#### ✔ Authorizer Dashboard
+- Review submitted forms
+- Approve or reject entries
+- Ensure quality and compliance standards
 
-#### **👨‍🔧 Employee Dashboard**
+#### 👨‍🔧 Employee Dashboard
+- Submit assigned maintenance forms
+- View form status
+- Simple and intuitive UI for daily usage
 
-* Submit daily maintenance forms
-* Access only assigned forms
-* Simple and clear UI for quick form entry
+---
+
+## 🔄 Workflow
+1. Technician submits maintenance form
+2. Form is locked and sent for authorization
+3. Authorizer reviews the data
+4. Form is either approved or rejected
+5. Rejected forms are unlocked for correction
 
 ---
 
 ## 🧱 Tech Stack
-
-* **Frontend:** HTML, CSS, JavaScript
-* **Backend:** Locally hosted server
-* **Database:** SQL-based local database
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** Node.js (Express)
+- **Database:** SQL Server
+- **Hosting:** Local server
 
 ---
 
@@ -111,6 +124,12 @@ medlab-qms-platform/
 ---
 
 ## 📌 Purpose
+This system improves accuracy, efficiency, and compliance in medical laboratory workflows by automating routine instrument maintenance and centralizing documentation.
 
-The MedLab QMS Platform improves **accuracy**, **efficiency**, and **compliance** in medical lab workflows by digitizing routine instrument maintenance and centralizing documentation.
+---
+
+## 👤 Author
+**Rishab S Malalikar**  
+Independently developed and implemented as a real-world production system.
+
 
