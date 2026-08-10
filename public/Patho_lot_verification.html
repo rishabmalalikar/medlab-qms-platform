@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Verification of Reagent Lot</title>
+  <title>QMS - Operator Maintenance Schedule For XN3100 Right</title>
+  <link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #f4f4f4; }
+    button { margin: 10px 5px; padding: 8px 15px; background: green; color: white; border: none; cursor: pointer; }
+    button:hover { background: darkgreen; }
+    .check-btn { background: blue; }
+    .check-btn:hover { background: darkblue; }
+  </style>
+</head>
+<body>
+<div  style="background-color: rgb(2, 2, 146); text-align: center;">
+    <h2 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
+  </div>
+
+  <div  style="background-color: rgb(2, 2, 146); margin-top: 0.5%; text-align: center;">
+    <h3 style="margin-bottom: 0%; margin-top: 0%; padding-bottom: 1%; padding-top: 1%; color: rgb(177, 250, 238);" >HI - TECH LABORATORY HAEMATOLOGY / CLINICAL PATHOLOGY DEPARTMENT</h3>
+  </div>
+  <body>
+  <h2 style="text-align: center;">Verification of Reagent Lot</h2>
+
+<label style=" font-size: large;font-weight: bold;">Select Date: </label>
+  <input style="width: 15%; height: 30px;" type="date" id="ActivityDate" required />
+  <button class="check-btn" onclick="checkEntry()">Check Entry</button>
+  <button onclick="window.history.back()" style="background: #888;">Back</button>
+  <button onclick="addEntry()">Add Entry</button>
+
+  <button onclick="saveForm()" style="position: relative;  margin-left:25%; padding-left: 25px; padding-right: 25px; font-size:medium;  ">Save</button>
+
+  <button id="sendAuthBtn" onclick="sendToAuthorization()"style=" padding-left: 25px; padding-right: 25px; font-size:medium;">Send for Authorization</button>
+
+
+  <div style="display: flex; justify-content: space-around; margin-top: 20px; align-items: center;">
+  <form style="width: 50%; font-size: large; font-weight: bold; border: solid 3px black; padding: 25px; border-radius: 20px;" id="reagentForm">
+  Reagent Name: <input style="width: 100%; height: 30px;" type="text" id="reagent_name"><br><br>
+  OLD Reagent Lot No: <input style="width: 60%; height: 30px;" type="text" id="old_lot_no">
+  Expiry: <input style="width: 20%; height: 30px;" type="date" id="old_expiry_date"><br><br>
+  NEW Reagent Lot No: <input style="width: 60%; height: 30px;" type="text" id="new_lot_no">
+  Expiry: <input style="width: 20%; height: 30px;" type="date" id="new_expiry_date"><br><br>
+  Verification Test: <input style="width: 100%; height: 30px;" type="text" id="verification_test"><br><br>
+  Material Used: <input style="width: 100%; height: 30px;" type="text" id="material_used"><br><br>
+  Result (Consistent/Inconsistent):<input style="width: 100%; height: 30px;" type="text" id="result_status"><br><br>
+
+R1:
+<input type="text" id="R1" step="0.01" style="width: 80%;"><br><br>
+R2:
+<input type="text" id="R2" step="0.01" style="width: 80%;"><br><br>
+Calculation  ((R<sub>1</sub> - R<sub>2</sub>) / R<sub>1</sub>) &times; 100:
+<input type="text" id="Calculation"  style="width: 31%;"><br><br>
+
+  Remarks / Corrective Action:<input style="width: 100%; height: 30px;" type="text" id="remarks"><br><br>
+  Tech Signature:<input style="width: 100%; height: 30px;" type="text" id="tech_sign"><br><br>
+</form>
+<img style="margin-left: 50px;" src="./img/table.png" alt="">
+</div>
+<h3>Entries Added For Selected Date</h3>
+
+<table id="entryTable">
+<thead>
+<tr>
+<th>Reagent Name</th>
+<th>Old Lot</th>
+<th>New Lot</th>
+<th>Test</th>
+<th>Result</th>
+<th>R1</th>
+<th>R2</th>
+<th>Calculation</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+</table>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div id="customModal" style="
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0, 0, 0, 0.900);
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        ">
+          <div style="background:rgb(18, 28, 70); padding:20px; border-radius:8px; width:350px; text-align:center; font-size:14px;">
+            <p id="modalMessage" style="color: rgb(214, 214, 214); font-size: larger;font-weight:400;">Message here...</p>
+            <div style="margin-top:15px;">
+              <button id="okBtn" style="background:green; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">OK</button>
+              <button id="cancelBtn" style="background:gray; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      function showModal(message, isConfirm = false) {
+        return new Promise(resolve => {
+          const modal = document.getElementById("customModal");
+          const msg = document.getElementById("modalMessage");
+          const okBtn = document.getElementById("okBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+
+          msg.innerText = message;
+          modal.style.display = "flex";
+          cancelBtn.style.display = isConfirm ? "inline-block" : "none";
+
+          okBtn.onclick = () => { modal.style.display = "none"; resolve(true); };
+          cancelBtn.onclick = () => { modal.style.display = "none"; resolve(false); };
+        });
+      }
+      // Override default alert & confirm
+      window.alert = function(message) {
+        return showModal(message, false);
+      };
+      window.confirm = function(message) {
+        return showModal(message, true);
+      };
+    });
+
+
+
+
+
+
+
+
+let editIndex = -1;
+
+// R1.addEventListener("input", calculate);
+// R2.addEventListener("input", calculate);
+
+// function calculate(){
+
+//  let r1 = parseFloat(R1.value) || 0;
+//  let r2 = parseFloat(R2.value) || 0;
+
+//  if(r1 !== 0){
+//    Calculation.value =
+//       (((r1-r2)/r1)*100).toFixed(2);
+//  }
+// }
+
+
+
+ 
+
+let dayEntries = [];
+function addEntry(){
+  if(!ActivityDate.value){
+   alert("Please select Activity Date");
+   return;
+}
+if(
+   !reagent_name.value ||
+   !old_lot_no.value ||
+   !new_lot_no.value ||
+   !old_expiry_date.value ||
+   !new_expiry_date.value ||
+   !verification_test.value ||
+   !material_used.value ||
+   !result_status.value ||
+   !R1.value ||
+   !R2.value ||
+   !Calculation.value ||
+   !remarks.value ||
+   !tech_sign.value
+){
+   alert("Please fill all mandatory fields");
+   return;
+}
+ let row = {
+
+   reagent_name : reagent_name.value,
+   old_lot_no : old_lot_no.value,
+   old_expiry_date : old_expiry_date.value,
+
+   new_lot_no : new_lot_no.value,
+   new_expiry_date : new_expiry_date.value,
+
+   verification_test : verification_test.value,
+   material_used : material_used.value,
+
+   result_status : result_status.value,
+   remarks : remarks.value,
+
+   tech_sign : tech_sign.value,
+
+   R1 : R1.value,
+   R2 : R2.value,
+   Calculation : Calculation.value
+
+ };
+
+ if(editIndex >= 0){
+
+   row.id = editingId;
+
+   dayEntries[editIndex] = row;
+
+   editIndex = -1;
+
+   editingId = null;
+
+}else{
+
+   dayEntries.push(row);
+
+}
+
+ renderTable();
+
+ clearEntryForm();
+}
+
+function clearEntryForm(){
+
+  reagent_name.value = "";
+  old_lot_no.value = "";
+  old_expiry_date.value = "";
+
+  new_lot_no.value = "";
+  new_expiry_date.value = "";
+
+  verification_test.value = "";
+  material_used.value = "";
+
+  result_status.value = "";
+
+  R1.value = "";
+  R2.value = "";
+  Calculation.value = "";
+
+  remarks.value = "";
+  tech_sign.value = "";
+}
+
+
+
+
+
+
+
+async function deleteEntry(index){
+const ok = await confirm(
+   "Are you sure you want to delete this entry?"
+ );
+
+ if(!ok) return;
+ const row = dayEntries[index];
+
+ if(row.id){
+
+    await fetch(`/delete-reagent/${row.id}`,{
+       method:"DELETE"
+    });
+ }
+
+ dayEntries.splice(index,1);
+
+ renderTable();
+}
+
+function loadEntries(records){
+
+    dayEntries = records.map(r => ({
+        id: r.id,
+        reagent_name: r.reagent_name,
+        old_lot_no: r.old_lot_no,
+        old_expiry_date: r.old_expiry_date?.split("T")[0],
+        new_lot_no: r.new_lot_no,
+        new_expiry_date: r.new_expiry_date?.split("T")[0],
+        verification_test: r.verification_test,
+        material_used: r.material_used,
+        result_status: r.result_status,
+        remarks: r.remarks,
+        tech_sign: r.tech_sign,
+        R1: r.R1,
+        R2: r.R2,
+        Calculation: r.Calculation
+    }));
+
+    renderTable();
+}
+
+function renderTable(){
+
+ let tbody =
+ document.querySelector("#entryTable tbody");
+
+ tbody.innerHTML="";
+
+ dayEntries.forEach((r,index)=>{
+
+   tbody.innerHTML += `
+   <tr>
+
+    <td>${r.reagent_name}</td>
+    <td>${r.old_lot_no}</td>
+    <td>${r.new_lot_no}</td>
+    <td>${r.verification_test}</td>
+    <td>${r.result_status}</td>
+    <td>${r.R1}</td>
+    <td>${r.R2}</td>
+    <td>${r.Calculation}</td>
+    <td>
+${locked ? "" : `
+<button onclick="editEntry(${index})">Edit</button>
+
+<button onclick="deleteEntry(${index})"
+style="background:red;">
+Delete
+</button>
+`}
+</td>
+
+   </tr>`;
+ });
+}
+
+let locked = false;
+
+function setFormDisabled(state){
+  document.querySelectorAll("#reagentForm input").forEach(i=>i.disabled = state);
+}
+
+async function checkEntry(){
+  const date = document.getElementById("ActivityDate").value;
+
+  const res = await fetch(`/check-reagent/${date}`);
+  const data = await res.json();
+  renderTable();
+  if (data.exists) {
+  alert("Entry is present");
+  loadEntries(data.records);
+
+  if (data.authStatus === "pending") {
+    alert("Form is sent to authorization and locked");
+    setFormDisabled(true);
+    locked = true;
+  }
+
+  if (data.authStatus === "authorized") {
+    alert("Form already authorized");
+    setFormDisabled(true);
+    locked = true;
+  }
+  if(data.authStatus === "rejected"){
+
+   alert("Authorization rejected. Please correct entries.");
+
+   setFormDisabled(false);
+
+   locked = false;
+
+}
+} else {
+  alert("NO entry is present");
+  setFormDisabled(false);
+}
+
+}
+
+function fillForm(d){
+  reagent_name.value = d.reagent_name;
+  old_lot_no.value = d.old_lot_no;
+  old_expiry_date.value = d.old_expiry_date?.split("T")[0];
+  new_lot_no.value = d.new_lot_no;
+  new_expiry_date.value = d.new_expiry_date?.split("T")[0];
+  verification_test.value = d.verification_test;
+  material_used.value = d.material_used;
+  result_status.value = d.result_status;
+  remarks.value = d.remarks;
+  tech_sign.value = d.tech_sign;
+}
+
+async function saveForm(){
+console.log(dayEntries);
+ await fetch("/save-reagent",{
+
+   method:"POST",
+
+   headers:{
+     "Content-Type":"application/json"
+   },
+
+   body: JSON.stringify({
+
+      ActivityDate:
+      ActivityDate.value,
+
+      entries:
+      dayEntries
+
+   })
+
+ });
+
+ alert("Saved");
+}
+
+
+let editingId = null;
+function editEntry(index){
+
+ const row = dayEntries[index];
+ editingId = row.id;
+ reagent_name.value = row.reagent_name;
+ old_lot_no.value = row.old_lot_no;
+ old_expiry_date.value = row.old_expiry_date;
+
+ new_lot_no.value = row.new_lot_no;
+ new_expiry_date.value = row.new_expiry_date;
+
+ verification_test.value = row.verification_test;
+ material_used.value = row.material_used;
+ result_status.value = row.result_status;
+
+ remarks.value = row.remarks;
+ tech_sign.value = row.tech_sign;
+
+ R1.value = row.R1;
+ R2.value = row.R2;
+ Calculation.value = row.Calculation;
+
+ editIndex = index;
+}
+
+
+
+async function sendToAuthorization(){
+
+ if(dayEntries.length === 0){
+   alert("No entries available");
+   return;
+ }
+
+ await fetch(`/send-reagent-auth/${ActivityDate.value}`,{
+    method:"POST"
+ });
+
+ alert("Sent to authorization & locked");
+
+ locked = true;
+ setFormDisabled(true);
+
+ renderTable();
+}
+</script>
+
+</body>
+</html>

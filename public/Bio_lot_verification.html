@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Validation Reagent New Lot Record</title>
+<link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse;  margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+    input[type="text"] { width: 90%; }
+    button { margin: 10px 5px; padding: 8px 15px; background: green; color: white; border: none; cursor: pointer; }
+    button:hover { background: darkgreen; }
+    .check-btn { background: blue; }
+    .check-btn:hover { background: darkblue; }
+    
+  </style>
+</head>
+<body>
+  <div  style="background-color: rgb(2, 2, 146); text-align: center;">
+    <h2 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
+  </div>
+
+  <div  style="background-color: rgb(2, 2, 146); margin-top: 0.5%; text-align: center;">
+    <h3 style="margin-bottom: 0%; margin-top: 0%; padding-bottom: 1%; padding-top: 1%; color: rgb(177, 250, 238);" >HI - TECH LABORATORY BIOCHEMISTRY DEPARTMENT</h3>
+  </div>
+<h2 style="text-align:center;">Validation Reagent New Lot Record</h2>
+
+Date:
+<input type="date" id="activityDate">
+<button onclick="checkEntry()">Check Entry</button>
+<button  onclick="window.history.back()" style="color: whith; background-color: gray;">Back</button>
+<button onclick="saveForm()">Submit</button>
+<button onclick="sendToAuthorization()">Send to Authorization</button>
+
+<br><br>
+
+Name of the reagent:
+<input type="text" id="reagentName" style="width:300px">
+
+<br><br>
+
+<table>
+<tr>
+<th>SR NO</th>
+<th>Lot No</th>
+<th>Expiry Date</th>
+<th>Open Date</th>
+<th colspan="2">CURRENT IQC Mean (Old Lot)</th>
+<th colspan="2">Current QC Value (New Lot)</th>
+<th>Acceptable / Not Acceptable</th>
+<th>Name of Technician / Signature</th>
+</tr>
+
+<tr>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th>L1</th>
+<th>L2</th>
+<th>L1</th>
+<th>L2</th>
+<th></th>
+<th></th>
+</tr>
+
+<tr>
+<td>1</td>
+<td><input type="text" id="lotNo"></td>
+<td><input type="date" id="expiryDate"></td>
+<td><input type="date" id="openDate"></td>
+<td><input type="text" id="oldL1"></td>
+<td><input type="text" id="oldL2"></td>
+<td><input type="text" id="newL1"></td>
+<td><input type="text"id="newL2"></td>
+<td><input type="text" id="acceptable"></td>
+<td><input type="text" id="techSign"></td>
+</tr>
+</table>
+
+<script>
+  
+  document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div id="customModal" style="
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0, 0, 0, 0.900);
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        ">
+          <div style="background:rgb(18, 28, 70); padding:20px; border-radius:8px; width:350px; text-align:center; font-size:14px;">
+            <p id="modalMessage" style="color: rgb(214, 214, 214); font-size: larger;font-weight:400;">Message here...</p>
+            <div style="margin-top:15px;">
+              <button id="okBtn" style="background:green; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">OK</button>
+              <button id="cancelBtn" style="background:gray; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      function showModal(message, isConfirm = false) {
+        return new Promise(resolve => {
+          const modal = document.getElementById("customModal");
+          const msg = document.getElementById("modalMessage");
+          const okBtn = document.getElementById("okBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+
+          msg.innerText = message;
+          modal.style.display = "flex";
+          cancelBtn.style.display = isConfirm ? "inline-block" : "none";
+
+          okBtn.onclick = () => { modal.style.display = "none"; resolve(true); };
+          cancelBtn.onclick = () => { modal.style.display = "none"; resolve(false); };
+        });
+      }
+      // Override default alert & confirm
+      window.alert = function(message) {
+        return showModal(message, false);
+      };
+      window.confirm = function(message) {
+        return showModal(message, true);
+      };
+    });
+
+
+
+
+
+
+const FORM_NAME = "VALIDATION_REAGENT_NEW_LOT";
+
+function enableForm(flag){
+ document.querySelectorAll("input").forEach(i=>i.disabled=!flag);
+}
+
+function clearForm(){
+ document.querySelectorAll("input").forEach(i=>i.value="");
+}
+
+async function checkEntry(){
+ const date = activityDate.value;
+ if(!date) return alert("Select date");
+
+ const res = await fetch(`/check-validation/${date}`);
+ const data = await res.json();
+
+ if(!data.exists){
+   alert("NO entry is present");
+   clearForm();
+   enableForm(true);
+ } else {
+   alert("Entry is present");
+
+   reagentName.value = data.row.ReagentName;
+   lotNo.value = data.row.LotNo;
+   expiryDate.value = data.row.ExpiryDate;
+   openDate.value = data.row.OpenDate;
+   oldL1.value = data.row.OldLot_L1;
+   oldL2.value = data.row.OldLot_L2;
+   newL1.value = data.row.NewLot_L1;
+   newL2.value = data.row.NewLot_L2;
+   acceptable.value = data.row.AcceptableStatus;
+   techSign.value = data.row.TechnicianSignature;
+
+   if(data.row.auth_status === "pending" || data.row.auth_status === "authorized"){
+     alert("Form is locked");
+     enableForm(false);
+   } else {
+     enableForm(true);
+   }
+ }
+}
+
+async function saveForm() {
+  const activityDate = document.getElementById("activityDate").value;
+
+  if (!activityDate) {
+    alert("Please select a valid date.");
+    return;
+  }
+
+  const payload = {
+    ActivityDate: activityDate,
+    ReagentName: document.getElementById("reagentName").value,
+    LotNo: document.getElementById("lotNo").value,
+    ExpiryDate: document.getElementById("expiryDate").value,
+    OpenDate: document.getElementById("openDate").value,
+    OldLot_L1: document.getElementById("oldL1").value,
+    OldLot_L2: document.getElementById("oldL2").value,
+    NewLot_L1: document.getElementById("newL1").value,
+    NewLot_L2: document.getElementById("newL2").value,
+    AcceptableStatus: document.getElementById("acceptable").value,
+    TechnicianSignature: document.getElementById("techSign").value
+  };
+
+  try {
+    const res = await fetch("/save-validation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const errorMessage = await res.text();
+      alert(`Error: ${errorMessage}`);
+      return;
+    }
+
+    alert("Data saved successfully.");
+  } catch (err) {
+    console.error("Error saving form:", err);
+    alert("Failed to save data.");
+  }
+}
+
+
+async function sendToAuthorization(){
+ const date = activityDate.value;
+ await fetch("/send-validation-auth",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({ FormName: FORM_NAME, ActivityDate: date })
+ });
+
+ alert("Sent to authorization and form is locked");
+ enableForm(false);
+}
+</script>
+
+</body>
+</html>

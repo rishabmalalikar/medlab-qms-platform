@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QMS - Login</title>
+  <link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body {
+      background: #f0f8ff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px #ccc;
+      text-align: center;
+      width: 300px;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      width: 95%;
+    }
+    button:hover { background: #0056b3; }
+    h2 { margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Employee Login</h2>
+    <input type="text" id="EID" placeholder="Employee ID" /><br />
+    <input type="password" id="password" placeholder="Password" /><br />
+    <button onclick="login()">Login</button>
+  </div>
+
+  <script>
+  async function login() {
+  const EID = document.getElementById('EID').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  if (!EID || !password) return alert("Please enter both fields");
+
+  const response = await fetch("http://10.0.9.188:5000/login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ EID, password }),
+  credentials: "include"
+});
+  const res = response;
+
+  const data = await res.json();
+  if (res.ok && data.redirect) {
+    //  Use full URL so same origin persists
+    window.location.href = data.redirect;
+  } else {
+    alert("Login failed: " + (data.message || res.statusText));
+  }
+}
+
+
+</script>
+</body>
+</html>

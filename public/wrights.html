@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QMS - Wright's Stain</title>
+  <link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 15px; }
+    h2 { text-align: center; margin-top: 10px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #f4f4f4; }
+    input[type="text"] { width: 95%; }
+    button { margin: 10px 5px; padding: 8px 15px; background: green; color: white; border: none; cursor: pointer; }
+    button:hover { background: darkgreen; }
+    .check-btn { background: blue; }
+    .check-btn:hover { background: darkblue; }
+  </style>
+</head>
+<body>
+  <div  style="background-color: rgb(2, 2, 146); text-align: center;">
+    <h2 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
+  </div>
+
+  <div  style="background-color: rgb(2, 2, 146); margin-top: 0.5%; text-align: center;">
+    <h3 style="margin-bottom: 0%; margin-top: 0%; padding-bottom: 1%; padding-top: 1%; color: rgb(177, 250, 238);" >HI - TECH LABORATORY HAEMATOLOGY / CLINICAL PATHOLOGY DEPARTMENT</h3>
+  </div>
+  <h2 style="text-align: center;">Daily Log of Wright's Stain</h2>
+
+  <label>Select Date: </label>
+  <input type="date" id="date" />
+
+  <button class="check-btn" onclick="checkEntry()">Check Entry</button>
+  <button onclick="window.history.back()" style="background: gray;">Back</button>
+  <button onclick="submitForm()" style="position: relative;  margin-left:46%; padding-left: 25px; padding-right: 25px; font-size:medium;  ">Submit</button>
+  <button id="sendAuthBtn" onclick="sendForAuthorization()"style=" padding-left: 25px; padding-right: 25px; font-size:medium;">Send for Authorization</button>
+
+  <table id="logTable">
+    <thead>
+      <tr>
+        <th>Sl. No.</th>
+        <th>Instrument Name</th>
+        <th>PH Buffer</th>
+        <th>PH Buffer 4</th>
+        <th>PH Buffer 7</th>
+        <th>Stain Filtered Wright’s/Retic</th>
+        <th>Quality of Staining</th>
+        <th>Checked By</th>
+        <th>Remarks</th>
+        <th>Corrective Action</th>
+        <th>Tech Sign</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr>
+        <td>1</td>
+        <td>Wright’s Staining Solution</td>
+        <td><input type="text" id="ph_buffer"></td>
+        <td><input type="text" id="ph_buffer4"></td>
+        <td><input type="text" id="ph_buffer7"></td>
+        <td><input type="text" id="stain_filtered"></td>
+        <td style="text-align: center; padding: 20px;">
+          <select name="quality_of_staining" id="quality_of_staining">
+            <option value="Good">A</option>
+            <option value="Acceptable">B</option>
+            <option value="Poor staining quality">C</option>
+          </select>
+        </td>    
+        <td><input type="text" id="checked_by"></td>
+        <td><input type="text" id="remark"></td>
+        <td><input type="text" id="corrective_action"></td>
+        <td><input type="text" id="tech_sign"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="display: flex; justify-content: space-evenly; font-size: large; font-weight: bold;">
+    <p >A-GOOD</p>
+    <p >B-ACCEPTABLE</p>
+    <p >C-POOR STAINING QUALITY/UNSATIFACTORY NEEDS CORRECTIVE ACTION</p>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    //  Custom modal
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div id="customModal" style="
+          display:none;
+          position:fixed;
+          top:0; left:0;
+          width:100%; height:100%;
+          background:rgba(0, 0, 0, 0.8);
+          justify-content:center;
+          align-items:center;
+          z-index:1000;
+        ">
+          <div style="background:#122; padding:20px; border-radius:8px; width:350px; text-align:center; font-size:14px;">
+            <p id="modalMessage" style="color:white; font-size:larger;">Message here...</p>
+            <div style="margin-top:15px;">
+              <button id="okBtn" style="background:green; color:white; padding:6px 15px; margin:5px; border:none; border-radius:4px;">OK</button>
+              <button id="cancelBtn" style="background:gray; color:white; padding:6px 15px; margin:5px; border:none; border-radius:4px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      function showModal(message, isConfirm = false) {
+        return new Promise(resolve => {
+          const modal = document.getElementById("customModal");
+          const msg = document.getElementById("modalMessage");
+          const okBtn = document.getElementById("okBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+
+          msg.innerText = message;
+          modal.style.display = "flex";
+          cancelBtn.style.display = isConfirm ? "inline-block" : "none";
+
+          okBtn.onclick = () => { modal.style.display = "none"; resolve(true); };
+          cancelBtn.onclick = () => { modal.style.display = "none"; resolve(false); };
+        });
+      }
+
+      window.alert = function(message) { return showModal(message, false); };
+      window.confirm = function(message) { return showModal(message, true); };
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    //  Load data for a selected date
+    async function checkEntry() {
+      const date = document.getElementById("date").value;
+      if (!date) return alert("Please select a date first.");
+
+      try {
+        const res = await fetch(`http://10.0.9.188:5000/wrights/${date}`);
+        if (!res.ok) {
+          const data = await res.json();
+          alert(data.message);
+          disableForm();
+          return;
+        }
+
+        const logs = await res.json();
+        if (logs.length > 0) {
+          const log = logs[0];
+          document.getElementById("ph_buffer").value = log.ph_buffer || "";
+          document.getElementById("ph_buffer4").value = log.ph_buffer4 || "";
+          document.getElementById("ph_buffer7").value = log.ph_buffer7 || "";
+          document.getElementById("stain_filtered").value = log.stain_filtered || "";
+          document.getElementById("quality_of_staining").value = log.quality_of_staining || "";
+          document.getElementById("checked_by").value = log.checked_by || "";
+          document.getElementById("remark").value = log.remark || "";
+          document.getElementById("corrective_action").value = log.corrective_action || "";
+          document.getElementById("tech_sign").value = log.tech_sign || "";
+          alert(" Data loaded successfully!");
+        } else {
+          alert("No entry found for this date.");
+          clearForm();
+        }
+      } catch (err) {
+        console.error(" Error fetching Wright's data:", err);
+        alert("Error fetching data from server.");
+      }
+    }
+
+    //  Submit data for selected date
+    async function submitForm() {
+      const date = document.getElementById("date").value;
+      if (!date) return alert("Please select a date first.");
+
+      const log = {
+        date,
+        ph_buffer: document.getElementById("ph_buffer").value,
+        ph_buffer4: document.getElementById("ph_buffer4").value,
+        ph_buffer7: document.getElementById("ph_buffer7").value,
+        stain_filtered: document.getElementById("stain_filtered").value,
+        quality_of_staining: document.getElementById("quality_of_staining").value,
+        checked_by: document.getElementById("checked_by").value,
+        remark: document.getElementById("remark").value,
+        corrective_action: document.getElementById("corrective_action").value,
+        tech_sign: document.getElementById("tech_sign").value
+      };
+
+      const res = await fetch("http://10.0.9.188:5000/wrights/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(log)
+      });
+
+      const msg = await res.text();
+      alert(msg);
+    }
+
+    //  Lock form
+    async function sendForAuthorization() {
+      const date = document.getElementById("date").value;
+      if (!date) return alert("Please select a date first.");
+
+      const formName = "WRIGHTS STAIN";
+
+      const res = await fetch("http://10.0.9.188:5000/send-for-authorization", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ formName, date }),
+        credentials: "include"
+      });
+
+      const msg = await res.text();
+      alert(msg);
+      if (res.ok) disableForm();
+    }
+
+    function disableForm() {
+      document.querySelectorAll("input, textarea, select, button").forEach(el => {
+        el.disabled = true;
+      });
+    }
+
+    function clearForm() {
+      document.querySelectorAll("input[type='text']").forEach(el => el.value = "");
+    }
+  
+  </script>
+</body>
+</html>

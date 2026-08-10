@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Referral Laboratory Register</title>
+<link rel="icon" href="./img/QMS1.jpg" type="image/png">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #f4f4f4; }
+    input[type="text"] { width: 100vw; }
+    button { margin: 10px 5px; padding: 8px 15px; background: green; color: white; border: none; cursor: pointer; }
+    button:hover { background: darkgreen; }
+    .check-btn { background: blue; }
+    .check-btn:hover { background: darkblue; }
+    
+  </style>
+</head>
+<body>
+
+    <div  style="background-color: rgb(2, 2, 146); text-align: center;">
+    <h2 style="margin: 0%; padding: 25px; padding-left: 50px; padding-top: 30px; padding-right: 50px; color: rgb(230, 230, 230);">K L E S DR.PRABHAKAR KORE HOSPITAL & MEDICAL RESEARCH CENTRE BELGAUM</h2>
+  </div>
+
+  <div  style="background-color: rgb(2, 2, 146); margin-top: 0.5%; text-align: center;">
+    <h3 style="margin-bottom: 0%; margin-top: 0%; padding-bottom: 1%; padding-top: 1%; color: rgb(177, 250, 238);" >HI - TECH LABORATORY</h3>
+  </div>
+
+
+<!-- <div style="display: flex;"> -->
+    <div style="display:inline-block;">
+        <button onclick="window.history.back()" style="background: #888; color: white; margin-bottom: 10px; font-size:medium;  display: block;">Back</button>
+    </div>
+    <div style="display: inline-block;  margin-left: 31%;">
+        <h2 style="text-align:center;">Referral Laboratory Register</h2>
+    </div>
+    
+    
+<!-- </div> -->
+
+
+
+
+<!-- DATA ENTRY -->
+<div>
+    <table>
+        <tr>
+            <th>Date & Time sample sent</th>
+            <th>Sample ID</th>
+            <th>Patient ID</th>
+            <th>Patient name</th>
+            <th>Test</th>
+            <th>Sample Type</th>
+            <th rowspan="2">Action</th>
+        </tr>
+
+        <tr>
+            <td><input type="datetime-local" id="SampleSentDateTime"></td>
+            <td><input id="SampleID"></td>
+            <td><input id="PatientID"></td>
+            <td><input id="PatientName"></td>
+            <td><input id="TestName"></td>
+            <td><input id="SampleType"></td>
+               
+        </tr>
+
+        <tr>
+            <th>Referral lab name</th>
+            <th>Sample collected by</th>
+            <th>Report Received Date</th>
+            <th>Report informed to</th>
+            <th>Report PDF</th>
+            <th>Remarks</th>
+            <td>
+                <button onclick="saveRow()">Save</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td><input id="ReferralLabName"></td>
+            <td><input id="SampleCollectedBy"></td>
+            <td><input type="date" id="ReportReceivedDate"></td>
+            <td><input id="ReportInformedTo"></td>
+            <td><input style="width: 100%;" type="file" id="ReportPDF" accept="application/pdf"></td>
+            <td><input id="Remarks"></td>
+            <td>
+                <button onclick="lockRow()">Lock</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+<br>
+<!-- <hr style="border:5px groove #ccc;">
+<hr style="border:5px inset #ccc;">
+<hr style="border:5px outset #ccc;"> -->
+<hr style="border:5px ridge #ccc;">
+<!-- <hr> -->
+
+<!-- FILTER -->
+<h3>Filter Records</h3>
+<div style="display: flex;">
+    <div>
+        <label>Date & Time Sample Sent:</label>
+        <input type="date" id="filterSampleDate">
+        <label>Report Received Date:</label>
+        <input type="date" id="filterReportDate">
+        <label>Status:</label>
+        <select id="filterStatus">
+            <option value="">All</option>
+            <option value="saved">Saved</option>
+            <option value="locked">Locked</option>
+        </select>
+        <br>
+        <button onclick="applyFilters()">Apply Filter</button>
+        <button onclick="clearFilters()">Clear</button>
+    </div>
+    <div style="display: flex; flex-direction: column; margin-left: 15%;" >
+        <div>
+            <label for="searchSampleID">Search Sample ID:</label>
+            <input id="searchSampleID">
+        </div>
+        <br>
+        <div>
+            <label for="searchPatientID">Search Patient ID:</label>
+            <input id="searchPatientID">
+        </div>
+        <!-- <div> -->
+            <button onclick="loadData()">Search</button>
+        <!-- </div> -->
+    </div>
+    
+</div>
+
+
+
+
+<!-- VIEWING SECTION -->
+<h3>Viewing Section</h3>
+<table id="viewTable">
+<thead>
+<tr>
+<th>DateTime</th><th>SampleID</th><th>PatientID</th><th>Name</th>
+<th>Test</th><th>SampleType</th><th>Lab</th><th>Collected By</th>
+<th>Report Date</th><th>Informed To</th>
+<th>PDF</th><th>Remarks</th><th>Status</th><th>Action</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+let editID = null;
+
+async function saveRow(lock=false) {
+  const fd = new FormData();
+  fd.append("RegisterID", editID || "");
+  fd.append("SampleSentDateTime", SampleSentDateTime.value);
+  fd.append("SampleID", SampleID.value);
+  fd.append("PatientID", PatientID.value);
+  fd.append("PatientName", PatientName.value);
+  fd.append("TestName", TestName.value);
+  fd.append("SampleType", SampleType.value);
+  fd.append("ReferralLabName", ReferralLabName.value);
+  fd.append("SampleCollectedBy", SampleCollectedBy.value);
+  fd.append("ReportReceivedDate", ReportReceivedDate.value);
+  fd.append("ReportInformedTo", ReportInformedTo.value);
+  fd.append("Remarks", Remarks.value);
+  fd.append("lock", lock);
+
+  if (ReportPDF.files[0]) fd.append("pdf", ReportPDF.files[0]);
+
+  await fetch("/referral/save", { method:"POST", body: fd });
+  clearForm();
+  loadData();
+}
+
+function lockRow(){ saveRow(true); }
+
+function clearForm(){
+ document.querySelectorAll("input").forEach(i=>i.value="");
+ editID=null;
+}
+
+async function loadData(){
+ const res = await fetch(`/referral/list?sample=${searchSampleID.value}&patient=${searchPatientID.value}`);
+ const data = await res.json();
+ const tbody = document.querySelector("#viewTable tbody");
+ tbody.innerHTML="";
+ data.forEach(r=>{
+  tbody.innerHTML+=`
+  <tr>
+    <td>${formatDateTime(r.SampleSentDateTime)}</td>
+    <td>${r.SampleID}</td>
+    <td>${r.PatientID}</td>
+    <td>${r.PatientName}</td>
+    <td>${r.TestName}</td>
+    <td>${r.SampleType}</td>
+    <td>${r.ReferralLabName}</td>
+    <td>${r.SampleCollectedBy}</td>
+    <td>${formatDateOnly(r.ReportReceivedDate)}</td>
+    <td>${r.ReportInformedTo||""}</td>
+    <td>${r.ReportPDF ? `<a href="/referral/pdf/${r.RegisterID}" target="_blank">View</a>`:""}</td>
+    <td>${r.Remarks||""}</td>
+    <td>${r.RowStatus}</td>
+    <td>${r.RowStatus==="saved" ? `<button onclick="editRow(${r.RegisterID})">Edit</button>`:"Locked"}</td>
+  </tr>`;
+ });
+}
+function renderTable(data){
+  const tbody = document.querySelector("#viewTable tbody");
+  tbody.innerHTML="";
+  data.forEach(r=>{
+    tbody.innerHTML+=`
+    <tr>
+      <td>${formatDateTime(r.SampleSentDateTime)}</td>
+      <td>${r.SampleID}</td>
+      <td>${r.PatientID}</td>
+      <td>${r.PatientName}</td>
+      <td>${r.TestName}</td>
+      <td>${r.SampleType}</td>
+      <td>${r.ReferralLabName}</td>
+      <td>${r.SampleCollectedBy}</td>
+      <td>${formatDateOnly(r.ReportReceivedDate)}</td>
+      <td>${r.ReportInformedTo||""}</td>
+      <td>${r.ReportPDF ? `<a href="/referral/pdf/${r.RegisterID}" target="_blank">View</a>`:""}</td>
+      <td>${r.Remarks||""}</td>
+      <td>${r.RowStatus}</td>
+      <td>${r.RowStatus==="saved" ? `<button onclick="editRow(${r.RegisterID})">Edit</button>`:"Locked"}</td>
+    </tr>`;
+  });
+}
+
+
+
+
+
+async function editRow(id){
+ const res = await fetch("/referral/get/"+id);
+ const d = await res.json();
+ editID=id;
+ Object.keys(d).forEach(k=>{
+  if(document.getElementById(k)) document.getElementById(k).value=d[k];
+ });
+}
+
+loadData();
+
+
+
+function applyFilters() {
+  const sd = filterSampleDate.value;
+  const rd = filterReportDate.value;
+  const st = filterStatus.value;
+
+  let q = "?";
+  if (sd) q += "sampleDate=" + sd + "&";
+  if (rd) q += "reportDate=" + rd + "&";
+  if (st) q += "status=" + st + "&";
+
+  fetch("/referral/filter" + q)
+    .then(res => res.json())
+    .then(data => renderTable(data));
+}
+
+function clearFilters() {
+  filterSampleDate.value = "";
+  filterReportDate.value = "";
+  filterStatus.value = "";
+  loadData();
+}
+
+function formatDateOnly(dt) {
+  if (!dt) return "";
+  const d = new Date(dt);
+  return d.toISOString().split("T")[0]; // YYYY-MM-DD
+}
+
+function formatDateTime(dt) {
+  if (!dt) return "";
+  const d = new Date(dt);
+
+  const date = d.toISOString().split("T")[0];
+
+  let hours = d.getHours();
+  let minutes = d.getMinutes().toString().padStart(2, "0");
+  let ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12;
+
+  return `${date} ${hours}:${minutes} ${ampm}`;
+}
+</script>
+
+</body>
+</html>

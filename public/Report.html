@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QMS Report</title>
+    <link rel="icon" href="./img/QMS1.jpg" type="image/png">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #f4f4f4; }
+        input, select { padding: 8px; margin: 5px; }
+        button { margin: 10px 5px; padding: 8px 15px; border: none; cursor: pointer; color: white; }
+        .fetch-btn { background: blue; }
+        .fetch-btn:hover { background: darkblue; }
+        .back-btn { background: gray; }
+        .print-btn { background: green; }
+    </style>
+</head>
+<body>
+    <h1>QMS Reports</h1>
+
+    <!-- Filter Section -->
+    <div>
+        <label for="formName">Form Name:</label>
+        <select id="formName">
+            <option value="">-- Select Form --</option>
+            <option value="Daily Activity Checklist">Daily Activity Checklist</option>
+            <option value="MICROSCOPE MAINTENANCE">MICROSCOPE MAINTENANCE</option>
+            <option value="BC6000Series MAINTENANCE">BC6000Series MAINTENANCE</option>
+            <option value="WRIGHTS STAIN">WRIGHTS STAIN</option>
+            <option value="CENTRIFUGE MAINTENANCE">CENTRIFUGE MAINTENANCE</option>
+            <option value="WATERBATH MAINTENANCE">WATERBATH MAINTENANCE</option>
+            <option value="pH METER">pH METER</option>
+            <option value="Operator Maintenance Schedule For XN1000">Operator Maintenance Schedule For XN1000</option>
+            <option value="Operator Maintenance Schedule For XN3100 Left">Operator Maintenance Schedule For XN3100 Left</option>
+            <option value="Operator Maintenance Schedule For XN3100 Right">Operator Maintenance Schedule For XN3100 Right</option>
+            <option value="Operator Maintenance Schedule For Sysmex SP-50">Operator Maintenance Schedule For Sysmex SP-50</option>
+            <option value="Maintenance_ACL_TOP_550">Maintenance_ACL_TOP_550</option>
+            <option value="INTER-OBSERVER RECORD MALARIAL">INTER-OBSERVER RECORD MALARIAL</option>
+            <option value="INTER-OBSERVER RECORD Reticulocyte Count">INTER-OBSERVER RECORD Reticulocyte Count</option>
+            <option value="INTER-OBSERVER RECORD Body Fluids">INTER-OBSERVER RECORD Body Fluids</option>
+            <option value="INTER-OBSERVER RECORD Peripheral Smear">INTER-OBSERVER RECORD Peripheral Smear</option>
+            <option value="ABG COBAS b 221 MAINTENANCE">ABG COBAS b 221 MAINTENANCE</option>
+            <option value="9180 ISE MAINTENANCE">9180 ISE MAINTENANCE</option>
+            <option value="D-10 HEMOGLOBIN-DM22C30002 TESTING SYSTEM">D-10 HEMOGLOBIN-DM22C30002 TESTING SYSTEM</option>
+            <option value="D-10 HEMOGLOBIN-DM22K09803 TESTING SYSTEM">D-10 HEMOGLOBIN-DM22K09803 TESTING SYSTEM</option>
+            <option value="COBAS PRO INTEGRATED">COBAS PRO INTEGRATED</option>
+            <option value="COBAS PURE INTEGRATED">COBAS PURE INTEGRATED</option>
+            <option value="LOT VERIFICATION PATHOLOGY">LOT VERIFICATION PATHOLOGY</option>
+            <option value="VALIDATION_REAGENT_NEW_LOT">VALIDATION_REAGENT_NEW_LOT</option>
+        </select>
+
+        <label for="fromDate">From Date:</label>
+        <input type="date" id="fromDate">
+
+        <label for="toDate">To Date:</label>
+        <input type="date" id="toDate">
+
+        <label for="authStatus">Status:</label>
+        <select id="authStatus">
+            <option value="">-- Select Status --</option>
+            <option value="pending">Pending</option>
+            <option value="authorized">Authorized</option>
+        </select>
+
+        <button class="fetch-btn" onclick="fetchReports()">Fetch Reports</button>
+        <button class="back-btn" onclick="window.location.href='authorizer-dashboard.html'">Back</button>
+        <button class="print-btn" onclick="window.print()">Print this page</button>
+    </div>
+
+    <!-- Reports Table -->
+    <table id="reportsTable" style="display: none;">
+        <thead>
+            <tr>
+                <th>Form Name</th>
+                <th>Activity Date</th>
+                <th>Created By</th>
+                <th>Status</th>
+                <th>Authorized By</th>
+                <th>Authorized Date</th>
+                <th>View data</th>
+            </tr>
+        </thead>
+        <tbody id="reportsTableBody">
+        </tbody>
+    </table>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+      document.body.insertAdjacentHTML("beforeend", `
+        <div id="customModal" style="
+            display:none;
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:rgba(0, 0, 0, 0.900);
+            justify-content:center;
+            align-items:center;
+            z-index:1000;
+        ">
+          <div style="background:rgb(18, 28, 70); padding:20px; border-radius:8px; width:350px; text-align:center; font-size:14px;">
+            <p id="modalMessage" style="color: rgb(214, 214, 214); font-size: larger;font-weight:400;">Message here...</p>
+            <div style="margin-top:15px;">
+              <button id="okBtn" style="background:green; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">OK</button>
+              <button id="cancelBtn" style="background:gray; color:white; padding:5px 15px; margin:5px; border:none; border-radius:4px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      function showModal(message, isConfirm = false) {
+        return new Promise(resolve => {
+          const modal = document.getElementById("customModal");
+          const msg = document.getElementById("modalMessage");
+          const okBtn = document.getElementById("okBtn");
+          const cancelBtn = document.getElementById("cancelBtn");
+
+          msg.innerText = message;
+          modal.style.display = "flex";
+          cancelBtn.style.display = isConfirm ? "inline-block" : "none";
+
+          okBtn.onclick = () => { modal.style.display = "none"; resolve(true); };
+          cancelBtn.onclick = () => { modal.style.display = "none"; resolve(false); };
+        });
+      }
+      // Override default alert & confirm
+      window.alert = function(message) {
+        return showModal(message, false);
+      };
+      window.confirm = function(message) {
+        return showModal(message, true);
+      };
+    });
+
+    async function fetchReports() {
+    const formName = document.getElementById("formName").value;
+    const fromDate = document.getElementById("fromDate").value;
+    const toDate = document.getElementById("toDate").value;
+    const authStatus = document.getElementById("authStatus").value;
+
+    // Validate inputs
+    if (!formName && !fromDate && !toDate && !authStatus) {
+        alert("Please select at least one filter.");
+        return;
+    }
+
+    try {
+        const queryParams = new URLSearchParams({
+            formName,
+            fromDate,
+            toDate,
+            authStatus
+        });
+
+        const response = await fetch(`http://10.0.9.188:5000/reports?${queryParams.toString()}`);
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            alert(errorMessage);
+            return;
+        }
+
+        const data = await response.json();
+        const tableBody = document.getElementById("reportsTableBody");
+        tableBody.innerHTML = "";
+        // console.log("Fetched reports:", data);
+
+        if (data.length === 0) {
+            alert("No records found.");
+            document.getElementById("reportsTable").style.display = "none";
+            return;
+        }
+
+        data.forEach((row) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${row.FormName}</td>
+                <td>${formatDate(row.ActivityDate)}</td>
+                <td>${row.CreatedBy || "N/A"}</td>
+                <td>${row.AuthStatus}</td>
+                <td>${row.AuthBy || "N/A"}</td>
+                <td>${row.AuthDate ? formatDate(row.AuthDate) : "N/A"}</td>
+                <td><button style="background:blue; color:white; padding:5px 10px; border:none; border-radius:4px;" onclick="viewForm('${row.FormName}', '${formatDate(row.ActivityDate)}')">View</button></td>
+                
+            `;
+            tableBody.appendChild(tr);
+        });
+
+        document.getElementById("reportsTable").style.display = "table";
+    } catch (error) {
+        console.error("Error fetching reports:", error);
+        alert("Failed to fetch reports. Please try again later.");
+    }
+}
+
+// Helper function to format dates to YYYY-MM-DD
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toISOString().slice(0, 10); // Extract YYYY-MM-DD
+}
+
+
+async function viewForm(formName, date) {
+    console.log("Viewing form:", formName, "Date:", date);
+
+      if (!formName || !date) {
+        alert("Please select both form and date.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://10.0.9.188:5000/view-form-data/${(formName)}/${date}`, {
+          credentials: "include"
+        });
+
+        if (!res.ok) {
+          const msg = await res.text();
+          alert(msg);
+          return;
+        }
+
+        const data = await res.json();
+        // console.log("Form data:", data);
+        const tbody = document.getElementById("viewTableBody");
+        tbody.innerHTML = "";
+
+        data.forEach((row, index) => {
+            console.log("Processing row:", row);
+          Object.entries(row).forEach(([key, value]) => {
+            
+            // console.log(`Field: ${key}, Value: ${value}`);
+//         //     if (["id", "year", "month", "auth_status", "auth_by", "auth_date"].includes(key)) return;
+            document.getElementById("viewFormTitle").innerText = `${formName} - ${date}`;
+            
+            const tr = document.createElement("tr");
+            // If value is an ISO datetime like "yyyy-mm-ddT00:00:00.000Z", convert to "yyyy-mm-dd"
+            if (typeof value === "string") {
+                const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
+                if (isoDateRegex.test(value)) {
+                    value = formatDate(value);
+                }
+            }
+            // tr.style.background = index % 2 === 0 ? "#f9f9f9" : "#ffffff";
+            tr.innerHTML = `
+              <td>${key}</td>
+              <td>${(value)}</td>
+            `;
+            document.getElementById("viewTableBody").appendChild(tr);
+          });
+        });
+
+//         document.getElementById("formTable").style.display = "table";
+        document.getElementById("viewModal").style.display = "flex";
+      } catch (err) {
+        console.error("Error viewing form data:", err);
+        alert("Failed to load form data.");
+      }
+    }
+
+
+
+
+function closeViewModal() {
+  document.getElementById("viewModal").style.display = "none";
+}
+
+
+
+    </script>
+
+
+<div id="viewModal" style="
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.8);
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+">
+  <div style="background:white; padding:20px; border-radius:10px; width:80%; max-height:80%; overflow:auto;">
+    <h3 id="viewFormTitle" style="margin-top:0;"></h3>
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#004d80; color:white;">
+          <!-- <th>Sr. No</th> -->
+          <th>Field</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody id="viewTableBody"></tbody>
+    </table>
+    <div style="text-align:right; margin-top:10px;">
+      <button onclick="closeViewModal()" style="background:gray; color:white;">Close</button>
+    </div>
+  </div>
+</div>
+
+
+
+</body>
+</html>
